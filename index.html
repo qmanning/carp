@@ -12,14 +12,14 @@
 <meta property="og:url" content="https://www.qmanning.com/labs/carp">
 <meta property="og:title" content="CARP | Covert Aquatic Reconnaissance Platforms">
 <meta property="og:description" content="Covert surveillance fish for allied governments, private estates & sensitive water features. Nobody suspects the fish.">
-<meta property="og:image" content="https://www.qmanning.com/labs/carp/assets/og.jpg">
+<meta property="og:image" content="https://www.qmanning.com/og/experiment/carp">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="CARP. An armored koi dives over the big stencil letters while an armored catfish rises below, both firing lasers, over the line Lethal. Listening. Wet.">
+<meta property="og:image:alt" content="Experiment, Unhinged & On-Brief No. 1: Lethal. Listening. Wet., beside the CARP letters, BigPuffa puffed up & an armored koi, with an Also on GitHub sticker">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="CARP | Covert Aquatic Reconnaissance Platforms">
 <meta name="twitter:description" content="Covert surveillance fish for allied governments, private estates & sensitive water features. Nobody suspects the fish.">
-<meta name="twitter:image" content="https://www.qmanning.com/labs/carp/assets/og.jpg">
+<meta name="twitter:image" content="https://www.qmanning.com/og/experiment/carp">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Stencil+Display:wght@800;900&family=Inter+Tight:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 <style>
@@ -83,8 +83,15 @@
   /* the real call to action sits under each section's copy & advances the story: solid yellow */
   .adv { background: var(--amber); color: #000; border-color: var(--amber); font-weight: 700; box-shadow: 0 0 22px rgba(255,184,0,.4); }
   .adv:hover { background: var(--ink); border-color: var(--ink); }   /* yellow = go (red reads as don't touch) */
-  .adv span { display: inline-block; animation: bob 1.4s ease-in-out infinite; }
-  @keyframes bob { 50% { transform: translateY(4px); } }
+  /* the arrow: three drawn chevrons stacked down the button, lighting up 1, 2, 3 like a trail heading down (Q 2026-11-05);
+     centred on the label with flex */
+  .adv { display: inline-flex; align-items: center; gap: 9px; }
+  .adv .arr { display: flex; flex-direction: column; align-items: center; gap: 1px; }
+  .adv .arr i { display: block; width: 0; height: 0; border-left: 4px solid transparent; border-right: 4px solid transparent; border-top: 4px solid currentColor; opacity: .2; animation: trail 1.2s linear infinite; }
+  .adv .arr i:nth-child(2) { animation-delay: .2s; }
+  .adv .arr i:nth-child(3) { animation-delay: .4s; }
+  @media (prefers-reduced-motion: reduce) { .adv .arr i { animation: none; opacity: 1; } }
+  @keyframes trail { 0%, 55%, 100% { opacity: .2; } 15% { opacity: 1; } }
   #p0 .quiet { position: absolute; top: 92px; left: 34px; pointer-events: auto; border: 0; padding: 0; color: var(--soft); font-size: 10px; }
   #p0 .quiet:hover { background: none; color: var(--amber); }
   /* the scroll watcher: calm "scroll to continue" at a story stop, louder "keep scrolling" (with the section's progress) mid-story */
@@ -195,32 +202,32 @@
 <div id="spacer"></div>
 <main>
   <section class="pane" id="p0">
-    <div class="copy"><div class="tag mono" id="story"></div><h2 class="chars" id="headline">Lethal. Listening. <span class="red">Wet.</span></h2><p class="late" id="lede">Covert surveillance fish for allied governments, private estates & sensitive water features. Nobody suspects the fish.</p><button class="mono late adv" id="brief" data-go="1"><span>▼</span> Next: Infiltrate</button></div>
+    <div class="copy"><div class="tag mono" id="story"></div><h2 class="chars" id="headline">Lethal. Listening. <span class="red">Wet.</span></h2><p class="late" id="lede">Covert surveillance fish for allied governments, private estates & sensitive water features. Nobody suspects the fish.</p><button class="mono late adv" id="brief" data-go="1"><span class="arr" aria-hidden="true"><i></i><i></i><i></i></span> Next: Infiltrate</button></div>
     <button class="mono late quiet" id="clear">Request clearance ↗</button>
   </section>
   <section class="pane photo" id="p1" data-photo="mayor" data-side="l" data-cap="Fig. 01 // Aquarium dedication, March 1934 // asset in frame" data-target=".376,.385,.1,.17" data-egg="https://www.youtube.com/watch?v=sIee3S-4jtY&t=1793s" data-intel="Subject identified // 98.6% match|Duke Jonathan Mordire|Despotic leader of Kergkakistan|Assassinated April 1934 // agent unknown">
-    <div class="copy right"><div class="tag mono">01 // KOI-class // Covert ops</div><h2 class="chars">Infiltrate.</h2><p class="late">Glasses, nose & mustache ship standard. Wherever the mission takes them, CARP units blend in: civic aquariums, ribbon cuttings, the mayor’s own tank.</p><ul class="brief mono late"><li>Disguise kit included</li><li>Facial recognition at 30 m</li><li>Nobody suspects the fish</li></ul><button class="mono adv" data-go="2"><span>▼</span> Next: Hold the bottom</button></div>
+    <div class="copy right"><div class="tag mono">01 // KOI-class // Covert ops</div><h2 class="chars">Infiltrate.</h2><p class="late">Glasses, nose & mustache ship standard. Wherever the mission takes them, CARP units blend in: civic aquariums, ribbon cuttings, the mayor’s own tank.</p><ul class="brief mono late"><li>Disguise kit included</li><li>Facial recognition at 30 m</li><li>Nobody suspects the fish</li></ul><button class="mono adv" data-go="2"><span class="arr" aria-hidden="true"><i></i><i></i><i></i></span> Next: Hold the bottom</button></div>
   </section>
   <section class="pane" id="p2" data-dam>
     <div class="dam" id="dam"></div>
-    <div class="copy"><div class="tag mono">02 // SILURUS // Infrastructure</div><h2 class="chars">Hold the <span class="red">bottom.</span></h2><p class="late">Parked at the base of the dam, one SILURUS unit hears every footstep on the crest at forty meters. Mud-grade camouflage. Zero beauty by design.</p><ul class="brief mono late"><li>Barbel-array sonar</li><li>Tracks seven targets at once</li><li>Holds station for 90 days</li></ul><button class="mono adv" data-go="3"><span>▼</span> Next: Hold the line</button></div>
+    <div class="copy"><div class="tag mono">02 // SILURUS // Infrastructure</div><h2 class="chars">Hold the <span class="red">bottom.</span></h2><p class="late">Parked at the base of the dam, one SILURUS unit hears every footstep on the crest at forty meters. Mud-grade camouflage. Zero beauty by design.</p><ul class="brief mono late"><li>Barbel-array sonar</li><li>Tracks seven targets at once</li><li>Holds station for 90 days</li></ul><button class="mono adv" data-go="3"><span class="arr" aria-hidden="true"><i></i><i></i><i></i></span> Next: Hold the line</button></div>
   </section>
   <section class="pane photo" id="p3" data-photo="bouncer,police" data-depth="1,1" data-side="r" data-cap="Fig. 03 // Door control, 1977 // pressure-rated to 1,200 m|Fig. 03b // Night patrol, Precinct 9 // ride-along">
     <div class="copy"><div class="tag mono">03 // Security & law enforcement</div><h2 class="chars">Hold<br>the <span class="red">line.</span></h2><p class="late">Close protection for embassies, galas & velvet ropes. Off the door, CARP units walk the beat: eight arms on the radio, one fin on the wheel, zero coffee breaks.</p>
-    <ul class="brief mono late"><li>Executive protection</li><li>Night patrol</li><li>Now recruiting: CARP Police Academy</li></ul><button class="mono adv" data-go="4"><span>▼</span> Next: Designate</button></div>
+    <ul class="brief mono late"><li>Executive protection</li><li>Night patrol</li><li>Now recruiting: CARP Police Academy</li></ul><button class="mono adv" data-go="4"><span class="arr" aria-hidden="true"><i></i><i></i><i></i></span> Next: Designate</button></div>
   </section>
   <section class="pane photo" id="p4" data-photo="humvee,volley" data-side="l" data-cap="Fig. 04 // Forward deployment // tank-mounted|Fig. 04b // Fleet recreation day, Miramar, 1986 // volleyball">
-    <div class="copy right"><div class="tag mono">04 // Joint operations</div><h2 class="chars">Designate.</h2><p class="late">Embedded with allied ground forces. Each unit rides in its own armored tank, paints the target, then crushes it at beach volleyball on Sundays.</p><ul class="brief mono late"><li>Tank-mounted & road-ready</li><li>Laser designation to 2 km</li><li>Need heavy support? Press +</li></ul><button class="mono adv" data-go="5"><span>▼</span> Next: First wave</button></div>
+    <div class="copy right"><div class="tag mono">04 // Joint operations</div><h2 class="chars">Designate.</h2><p class="late">Embedded with allied ground forces. Each unit rides in its own armored tank, paints the target, then crushes it at beach volleyball on Sundays.</p><ul class="brief mono late"><li>Tank-mounted & road-ready</li><li>Laser designation to 2 km</li><li>Need heavy support? Press +</li></ul><button class="mono adv" data-go="5"><span class="arr" aria-hidden="true"><i></i><i></i><i></i></span> Next: First wave</button></div>
   </section>
   <section class="pane photo" id="p5" data-photo="normandy,warroom,trench" data-depth="1,0,0" data-side="r" data-cap="Fig. 05 // Normandy, June 1944 // first wave|Fig. 05b // War room, May 1944 // Fleet Adm. B. Whale presiding|Fig. 05c // Western Front, 1917 // trench diver, catfish class">
     <div class="copy"><div class="tag mono">05 // Heritage // Operation Carp</div><h2 class="chars">First <span class="red">wave.</span></h2><p class="late">Normandy, 1944. Fish in brass diving suits went ashore first, on a plan from Fleet Admiral Bartholomew Whale: four stars, one blowhole. Veterans of the 1917 trenches led the way.</p>
-    <ul class="brief mono late"><li>400 units ashore in 11 minutes</li><li>First through the beach obstacles</li><li>Use the arrows for more from the front</li></ul><button class="mono adv" data-go="6"><span>▼</span> Next: Unveiled once</button></div>
+    <ul class="brief mono late"><li>400 units ashore in 11 minutes</li><li>First through the beach obstacles</li><li>Use the arrows for more from the front</li></ul><button class="mono adv" data-go="6"><span class="arr" aria-hidden="true"><i></i><i></i><i></i></span> Next: Unveiled once</button></div>
   </section>
   <section class="pane photo" id="p6" data-photo="expo,plate" data-side="l" data-cap="Fig. 06 // The Great Exhibition, London, 1851|Plate I // Aquatic armour, experimental articulated apparatus, 1885">
-    <div class="copy right"><div class="tag mono">06 // Heritage</div><h2 class="chars">Unveiled <span class="red">once.</span></h2><p class="late">London, 1851. Shown to the public once at the Great Exhibition, then classified. The 1885 plates survive: cranial collar, articulated plates & a pressure gauge good to 50 ft of water.</p><ul class="brief mono late"><li>Six-part articulated armour</li><li>Monocle on a retaining chain</li><li>Top hat fitted with underwater strap</li></ul><button class="mono adv" data-go="7"><span>▼</span> Next: Since 1509</button></div>
+    <div class="copy right"><div class="tag mono">06 // Heritage</div><h2 class="chars">Unveiled <span class="red">once.</span></h2><p class="late">London, 1851. Shown to the public once at the Great Exhibition, then classified. The 1885 plates survive: cranial collar, articulated plates & a pressure gauge good to 50 ft of water.</p><ul class="brief mono late"><li>Six-part articulated armour</li><li>Monocle on a retaining chain</li><li>Top hat fitted with underwater strap</li></ul><button class="mono adv" data-go="7"><span class="arr" aria-hidden="true"><i></i><i></i><i></i></span> Next: Since 1509</button></div>
   </section>
   <section class="pane photo" id="p7" data-photo="venice" data-side="r" data-cap="Fig. 07 // Grand Canal, Venice, 1509">
-    <div class="copy"><div class="tag mono">07 // Heritage</div><h2 class="chars">Since <span class="red">1509.</span></h2><p class="late">Our oldest contract: a sworn koi in the service of the Doge of Venice. Paid in gold, fed in silver & still on retainer five centuries later.</p><ul class="brief mono late"><li>Commissioned 1509</li><li>Canal patrol & state ceremony</li><li>Mustache grandfathered in</li></ul><button class="mono adv" data-go="8"><span>▼</span> Next: Request clearance</button></div>
+    <div class="copy"><div class="tag mono">07 // Heritage</div><h2 class="chars">Since <span class="red">1509.</span></h2><p class="late">Our oldest contract: a sworn koi in the service of the Doge of Venice. Paid in gold, fed in silver & still on retainer five centuries later.</p><ul class="brief mono late"><li>Commissioned 1509</li><li>Canal patrol & state ceremony</li><li>Mustache grandfathered in</li></ul><button class="mono adv" data-go="8"><span class="arr" aria-hidden="true"><i></i><i></i><i></i></span> Next: Request clearance</button></div>
   </section>
   <section class="pane" id="p8">
     <div class="copy"><div class="tag mono">08 // Procurement</div><h2 class="chars">Request <span class="red">clearance.</span></h2><p class="late">Demonstrations are held in a secure pond. Bring clearance & a towel. Units ship worldwide in unmarked aquariums within six to eight weeks.</p><ul class="brief mono late"><li>Three platforms: KOI, SILURUS & TUNA</li><li>Financing for allied governments</li><li>Ponds sold separately</li></ul><button class="mono adv" id="brief2">Request clearance ↗</button></div>
@@ -257,12 +264,18 @@ void main() { o = texture(s, vec2(v.x, 1. - v.y)) * a; }`);
 const meshP = prog(`#version 300 es
 in vec2 p; in vec2 uv; out vec2 t; uniform vec2 res; uniform vec2 off;
 void main() { t = uv; vec2 c = (p + off) / res * 2. - 1.; gl_Position = vec4(c.x, -c.y, 0, 1); }`, `#version 300 es
-precision mediump float; in vec2 t; out vec4 o; uniform sampler2D s; uniform float shade; uniform float a;
-void main() { vec4 c = texture(s, t); o = shade > .5 ? vec4(0, 0, 0, c.a) * a : c * a; }`);
+precision mediump float; in vec2 t; out vec4 o; uniform sampler2D s; uniform float shade; uniform float a; uniform float pop;
+void main() {
+  vec4 c = texture(s, t);
+  // pop: a unit's colour lift (the koi's: brighter & more saturated, Q 2026-11-05), on the straight colour so the edges stay clean
+  vec3 rgb = c.a > 0. ? c.rgb / c.a : c.rgb; float l = dot(rgb, vec3(.299, .587, .114));
+  rgb = clamp(mix(vec3(l), rgb, 1. + pop * .45) * (1. + pop * .18), 0., 1.);
+  o = shade > .5 ? vec4(0, 0, 0, c.a) * a : vec4(rgb * c.a, c.a) * a;
+}`);
 // the water over everything: wobble, ripples, drifting caustic light & a hair of chromatic aberration
 const waterP = prog(QUAD_VS, `#version 300 es
 precision highp float; in vec2 v; out vec4 o;
-uniform sampler2D s; uniform vec2 res; uniform float t; uniform float dpr; uniform float cam; uniform vec4 rip[10]; uniform vec4 wake[16];
+uniform sampler2D s; uniform vec2 res; uniform float t; uniform float dpr; uniform float cam; uniform vec4 rip[10]; uniform vec4 wake[16]; uniform vec4 fin[12];
 float caust(vec2 p, float t) {
   float c = 0.;
   for (int i = 0; i < 4; i++) {
@@ -288,6 +301,12 @@ void main() {
     vec2 dd = wpx - r.xy; float dist = length(dd), front = 10. + age * 120.;
     float w = exp(-pow((dist - front) / 18., 2.)) * (1. - age / 2.6) * r.w;
     d += normalize(dd + .001) * sin((dist - front) * .38) * w * 9.; glint += w * max(0., sin((dist - front) * .38));
+  }
+  for (int i = 0; i < 12; i++) {   // BigPuffa's fins: the tiniest, quickest rings (Q 2026-11-05: "cute fins")
+    vec4 r = fin[i]; float age = t - r.z; if (age < 0. || age > .7 || r.w <= 0.) continue;
+    vec2 dd = wpx - r.xy; float dist = length(dd), front = 2. + age * 55.;
+    float w = exp(-pow((dist - front) / 5., 2.)) * (1. - age / .7) * r.w;
+    d += normalize(dd + .001) * sin((dist - front) * 1.1) * w * 2.6; glint += w * max(0., sin((dist - front) * 1.1)) * .6;
   }
   vec2 uv = (px + d) / res; uv.y = 1. - uv.y;
   float ca = 1.4 / res.x;
@@ -373,6 +392,7 @@ function plan(k, t, i) {
 
 // ---------- fish ----------
 const fishTex = [], fishImg = [];
+const POP = [1, 0, 0];   // each unit's colour lift in the fish shader: the koi brighter & richer, the others as painted
 [1, 2, 3].forEach((n, i) => { const im = new Image(); im.onload = () => { fishImg[i] = im; fishTex[i] = tex(); upload(fishTex[i], im); }; im.src = `assets/fish-${n}.png`; });
 class Fish {
   constructor(i, late) {
@@ -382,7 +402,7 @@ class Fish {
       for (let s = 0; s < 2000; s += 3) this.trail.push({ x: this.x, y: this.y + s });
     }
   }
-  get len() { return Math.min(H * .58, W * .42) * [1, 1.4, 2.1][this.i]; }   // SILURUS is big, the tuna (the tank) much bigger still
+  get len() { return Math.min(H * .58, W * .42) * [1.25, 1.4, 2.1][this.i]; }   // the koi a quarter up (Q 2026-11-05); SILURUS is big, the tuna (the tank) much bigger still
   reset() {
     // the koi drops in from the top, the catfish rises from the bottom
     this.x = W * (this.i ? .6 : .4); this.y = this.i ? H + this.len * .7 : -this.len * .7; this.a = this.i ? -Math.PI / 2 - .2 : Math.PI / 2 - .2;
@@ -414,6 +434,13 @@ class Fish {
     for (const o of fleet) if (o !== this) {   // keep a body-width apart
       const dx = this.x - o.x, dy = this.y - o.y, d = Math.hypot(dx, dy), min = (L + o.len) * (this.i === 2 || o.i === 2 ? .22 : .4);   // the tuna is too big to give everyone a full body-width
       if (d < min && d > 0) { tx += dx / d * (min - d) * 2; ty += dy / d * (min - d) * 2; }
+    }
+    if (puffer.on && puffer.inf > .4) {   // PUFF-04 puffed up: spines out, so the fleet steers clear (only then; deflated, they barge through)
+      const pr = puffer.r + L * .22;
+      for (const k of [0, .4, .8, 1.2]) {
+        const ax = this.x + Math.cos(this.a) * L * k, ay = this.y + Math.sin(this.a) * L * k, d = Math.hypot(ax - puffer.x, ay - puffer.y);
+        if (d < pr) { const u = d || 1; tx = this.x + (ax - puffer.x) / u * L * 1.3; ty = this.y + (ay - puffer.y) / u * L * 1.3; break; }
+      }
     }
     for (const b of barriers) {   // keep off the copy
       const pad = L * .3;
@@ -526,9 +553,180 @@ function drawFish(f) {
   gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, fishTex[f.i]); gl.uniform1i(meshP.u.s, 0);
   gl.uniform1f(meshP.u.shade, 1);
   for (const [dx, dy] of [[0, 0], [6, 5], [-5, 7], [4, -4], [10, 12]]) { gl.uniform2f(meshP.u.off, L * .05 + dx, L * .08 + dy - camY); gl.uniform1f(meshP.u.a, .13); gl.drawArrays(gl.TRIANGLE_STRIP, 0, m.n); }
-  gl.uniform1f(meshP.u.shade, 0); gl.uniform2f(meshP.u.off, 0, -camY); gl.uniform1f(meshP.u.a, 1);
+  gl.uniform1f(meshP.u.shade, 0); gl.uniform2f(meshP.u.off, 0, -camY); gl.uniform1f(meshP.u.a, 1); gl.uniform1f(meshP.u.pop, POP[f.i]);
   gl.drawArrays(gl.TRIANGLE_STRIP, 0, m.n);
   return m;
+}
+// ---------- PUFF-04 // Countermeasures: a spiked puffer (Q 2026-11-05). It swims like a real one, fins buzzing &
+// getting nowhere fast, & it keeps away from the fleet. When a fish bumps it anyway it puffs up (through Q's four painted
+// stages, assets/puffer-1..4.png) & stays puffed, still trying to get away, until nothing has hit it for PUFF_CALM s;
+// then it deflates like a let-go balloon, zipping about on the escaping air. Clicking it puffs it too.
+// Between stages the two paintings are scaled to one shared outline & crossfaded, so it reads as a morph, not a fade.
+const puffTex = [];
+[1, 2, 3, 4].forEach((n, i) => { const im = new Image(); im.onload = () => { puffTex[i] = tex(); upload(puffTex[i], im); }; im.src = `assets/puffer-${n}.png`; });
+const PUFF_AT = 6.8, PUFF_CALM = 3;   // a beat after the intro settles (REST_AT 5.6, defined further down)
+// each stage's outline in its painting (fractions of the shared canvas, measured) & how far its centre sits off the middle
+const PW = [.428, .55, .87, .919], PH = [.549, .696, .89, .987], PCY = [.024, -.006, .016, -.003];
+const puffer = {
+  on: false, x: 0, y: 0, vx: 0, vy: 0, head: 0, spin: 0, vspin: 0, inf: 0, vinf: 0, target: 0, until: 0,
+  sq: 0, vsq: 0, flap: 0, wp: null, leak: 0, leakFrom: 0, jet: 0, phase: Math.random() * TAU,
+  get S() { return Math.min(W, H) * .36; },   // the painted canvas's side
+  get r() { return this.S * (.2 + .25 * clamp(this.inf)); },   // the body's radius for bumps & clicks
+  // he swims in from above the screen: the top edge only holds him once he's all the way in (Q: he "just appeared")
+  enter() { this.on = true; this.entering = true; this.x = W * .8; this.y = camY - this.S * .55; this.vx = -W * .02; this.vy = H * .3; this.head = Math.PI; },
+  puff(t, hold = 4) { if (!this.target) this.hold = hold; this.target = 1; this.until = t + hold; this.leak = 0; this.vsq += 2.2; },
+  // where it potters next: of a few spots on screen, the one furthest from the fleet
+  pick(t) {
+    const pad = this.S * .3; let best = null, bd = -1;
+    for (let n = 0; n < 8; n++) {
+      const c = { x: pad + Math.random() * (W - pad * 2), y: camY + pad + Math.random() * (H - pad * 2) };
+      const d = Math.min(...fleet.filter(f => f.entered).map(f => Math.hypot(f.x - c.x, f.y - c.y)), 1e9);
+      if (d > bd) { bd = d; best = c; }
+    }
+    this.wp = { ...best, until: t + 2.5 + Math.random() * 3 };
+  },
+  step(dt, t) {
+    if (!this.on) return;
+    const big = clamp(this.inf);
+    // puffed up: hold, then let go, & the leak takes ~1.4 s
+    if (this.target && t > this.until) { this.target = 0; this.leak = t; this.leakFrom = this.inf; this.jet = Math.random() * TAU; }
+    if (this.target) { this.vinf += ((1 - this.inf) * 70 - this.vinf * 9) * dt; this.inf += this.vinf * dt; }
+    else if (this.leak) {
+      const u = clamp((t - this.leak) / 1.4), e = u < .5 ? 2 * u * u : 1 - Math.pow(-2 * u + 2, 2) / 2;
+      this.inf = this.leakFrom * (1 - e);
+      // the escaping air: a jet out of the mouth pushes it tail first, the jet wandering as it flaps about
+      this.jet += (Math.sin(t * 9) * 5 + (Math.random() - .5) * 8) * dt;
+      const thrust = this.S * 5.5 * (1 - u) * this.leakFrom, a = this.head + this.spin + Math.PI / 2;
+      this.vx += Math.cos(a + Math.sin(this.jet) * .8) * thrust * dt; this.vy += Math.sin(a + Math.sin(this.jet) * .8) * thrust * dt;
+      this.vspin += Math.sin(this.jet * 1.7) * 14 * (1 - u) * dt; this.vsq += Math.sin(t * 40) * 6 * (1 - u) * dt;
+      if (u >= 1) { this.leak = 0; this.inf = 0; }
+    }
+    // swimming: deflated it buzzes along slowly toward its waypoint; puffed up it can't swim, it just drifts
+    if (!this.wp || t > this.wp.until || Math.hypot(this.wp.x - this.x, this.wp.y - this.y) < this.S * .15) this.pick(t);
+    // it keeps away from the fleet: each fish near it pushes its course away (harder the closer), over its waypoint
+    let fx = 0, fy = 0;
+    for (const f of fleet) {
+      if (!f.entered) continue;
+      const ox = this.x - f.x, oy = this.y - f.y, od = Math.hypot(ox, oy) || 1, reach = f.len * 1.1 + this.r;
+      if (od < reach) { const w = (1 - od / reach) ** 2 * 3; fx += ox / od * w; fy += oy / od * w; }
+    }
+    const fleeing = fx * fx + fy * fy > .01, swim = (this.leak ? 0 : 1) * (1 - big * .7);   // puffed it still tries, weakly
+    const wx = this.wp.x - this.x, wy = this.wp.y - this.y, wd = Math.hypot(wx, wy) || 1;
+    let dx = wx / wd + fx, dy = wy / wd + fy; const d = Math.hypot(dx, dy) || 1; dx /= d; dy /= d;
+    const top = this.S * (fleeing ? .7 : .45);
+    this.vx += (dx * top - this.vx) * 1.2 * swim * dt; this.vy += (dy * top - this.vy) * 1.2 * swim * dt;
+    const drag = Math.exp(-dt * (1.1 - big * .5)); this.vx *= drag; this.vy *= drag;
+    this.x += this.vx * dt; this.y += this.vy * dt;
+    // it faces where it's going (mouth first) once it's moving with purpose; a hit's spin plays out & rights itself
+    const sp = Math.hypot(this.vx, this.vy);
+    if (sp > this.S * .08 && !this.leak) { let dh = Math.atan2(this.vy, this.vx) + Math.PI / 2 - this.head; dh = Math.atan2(Math.sin(dh), Math.cos(dh)); this.head += dh * Math.min(1, dt * 2.5); }
+    this.vspin = clamp(this.vspin, -12, 12);   // about two turns a second at most
+    this.vspin += (-this.spin * 3 - this.vspin * 1.6) * dt; this.spin += this.vspin * dt;
+    if (Math.abs(this.spin) > TAU) { this.head += this.spin; this.spin = 0; }   // after a full turn, keep the new facing
+    this.vsq += (-this.sq * 90 - this.vsq * 7) * dt; this.sq += this.vsq * dt;   // squash & stretch, springing back
+    // the fins buzz: fast always, faster when it's trying to get somewhere
+    this.flap += dt * (16 + swim * 10 + (fleeing || this.target ? 10 : 0));   // frantic when it's getting away
+    // the fleet bats it around: each fish's body is a chain of bumpers that punts it along the fish's heading
+    for (const f of fleet) {
+      if (!f.entered) continue;
+      const fv = { x: Math.cos(f.a) * f.speed, y: Math.sin(f.a) * f.speed }, rf = f.len * .085;
+      for (const q of f.spine(10)) {
+        const ox = this.x - q.x, oy = this.y - q.y, od = Math.hypot(ox, oy) || 1, min = this.r + rf;
+        if (od >= min) continue;
+        const nx = ox / od, ny = oy / od; this.x = q.x + nx * min; this.y = q.y + ny * min;
+        const rel = (fv.x - this.vx) * nx + (fv.y - this.vy) * ny;
+        if (rel > 0) {
+          const kick = rel * (1.25 + big * .5) + 70;
+          this.vx += nx * kick + fv.x * .25; this.vy += ny * kick + fv.y * .25;
+          const side = Math.sign(nx * fv.y - ny * fv.x) || (Math.random() < .5 ? -1 : 1);
+          this.vspin += side * (5 + kick / (this.r + 1) * 3 + Math.random() * 4);   // a real spin, not a nudge
+          this.vsq -= 1.6 + big;
+          this.puff(t, PUFF_CALM);   // any hit: it puffs up, & stays up until nothing has hit it for PUFF_CALM s
+          if (t - (this.lastBump || 0) > .25) { this.lastBump = t; ripple(this.x, this.y, t, .7); }
+        }
+        break;
+      }
+    }
+    // the edges of the screen: it rebounds (bouncier when puffed) & the bounce spins it too
+    const r = this.r, e = .7 + big * .2, lo = camY + r + 30, hi = camY + H - r - 40;
+    if (this.x < r) { this.x = r; this.vx = Math.abs(this.vx) * e; this.vspin -= this.vy / (r + 1) * .8; }
+    if (this.x > W - r) { this.x = W - r; this.vx = -Math.abs(this.vx) * e; this.vspin += this.vy / (r + 1) * .8; }
+    if (this.entering) { if (this.y > lo) this.entering = false; else this.vy = Math.max(this.vy, H * .12); }   // keep coming down till he's in
+    else if (this.y < lo) { this.y = lo; this.vy = Math.abs(this.vy) * e; this.vspin += this.vx / (r + 1) * .8; }
+    if (this.y > hi) { this.y = hi; this.vy = -Math.abs(this.vy) * e; this.vspin -= this.vx / (r + 1) * .8; }
+  },
+  hit(x, y) { return this.on && Math.hypot(x - this.x, y - this.y) < this.r * 1.1; },
+};
+// PUFF-04's notice: no klaxon, no banner (Q: "not as big of an announcement as BLUETUNA's arrival"), just the fleet's
+// own tag style beside it, red while it's armed & amber while it leaks back down
+function puffTag(g, t) {
+  const p = puffer; if (!p.on || (!p.target && !p.leak)) return;
+  const armed = !!p.target, since = armed ? t - (p.until - (p.hold || 4)) : t - p.leak;
+  const a = armed ? (since < .5 ? (Math.floor(since * 12) % 2 ? 1 : .2) : 1) : clamp(1 - (t - p.leak) / 1.4);
+  const r = p.r * 1.05, x = p.x, y = p.y - camY, col = armed ? '255,42,31' : '255,184,0';
+  g.save(); g.globalAlpha = a; g.strokeStyle = `rgba(${col},.85)`; g.lineWidth = 1.4;
+  for (const [dx, dy] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) { g.beginPath(); g.moveTo(x + dx * r, y + dy * r * .7); g.lineTo(x + dx * r, y + dy * r); g.lineTo(x + dx * r * .7, y + dy * r); g.stroke(); }
+  g.font = '700 10px JetBrains Mono'; g.fillStyle = `rgba(${col},.95)`;
+  const right = x + r + 8 + 260 < W, tx = right ? x + r + 8 : x - r - 8; g.textAlign = right ? 'left' : 'right';
+  g.fillText(armed ? 'PUFF-04 // COUNTERMEASURES DEPLOYED' : 'PUFF-04 // STANDING DOWN', tx, y - r + 10);
+  g.fillStyle = 'rgba(237,235,228,.55)'; g.fillText(armed ? 'SPINES ARMED  //  DO NOT TOUCH' : 'VENTING', tx, y - r + 24);
+  g.restore();
+}
+// one stage as a little grid, so the fins & tail can flutter; (tw, th): the outline it's stretched to this frame
+// the fins' rings: one off each fin tip on every beat (quick, tiny), more urgent when he's fleeing
+const finRings = new Float32Array(48); let finN = 0;
+function puffFins(t) {
+  const p = puffer; if (!p.on || still) return;
+  const beat = Math.floor(p.flap / Math.PI); if (beat === p.finBeat) return; p.finBeat = beat;
+  const u = clamp(p.inf) * 3, k = Math.min(2, Math.floor(u)), f = u - k;
+  const tw = PW[k] + (PW[k + 1] - PW[k]) * f, th = PH[k] + (PH[k + 1] - PH[k]) * f, S = p.S;
+  const rot = p.head + p.spin, c = Math.cos(rot), n = Math.sin(rot), side = beat % 2 ? 1 : -1;
+  const x = side * tw * S * .5, y = -.15 * th * S * .5;
+  const fx = p.x + x * c - y * n, fy = p.y + x * n + y * c;
+  if (fx < 0 || fx > W || fy - camY < 0 || fy - camY > H) return;
+  finRings.set([fx, fy, t, .7 + Math.min(.6, Math.hypot(p.vx, p.vy) / (S * 1.2))], (finN++ % 12) * 4);
+}
+const PG = 14, puffBuf = gl.createBuffer(), puffV = new Float32Array(PG * PG * 6 * 4);
+function puffMesh(k, tw, th, t) {
+  const p = puffer, S = p.S, sx = tw / PW[k] * (1 + p.sq * .5), sy = th / PH[k] * (1 - p.sq * .5);
+  const rot = p.head + p.spin, c = Math.cos(rot), n = Math.sin(rot), bob = Math.sin(t * 1.6 + p.phase) * S * .01;
+  const amp = .055 * (1 - clamp(p.inf) * .6);
+  const at = (u, v) => {
+    let x = (u - .5) * S * sx, y = (v - .5 - PCY[k]) * S * sy;
+    // in the fish's own frame: X across (-1..1), Y down its length (-1 mouth .. 1 tail)
+    const X = (u - .5) / (PW[k] / 2), Y = (v - .5 - PCY[k]) / (PH[k] / 2);
+    const fin = clamp((Math.abs(X) - .6) / .4) * Math.exp(-((Y + .15) ** 2) / .06), tail = clamp((Y - .72) / .3) * Math.exp(-(X * X) / .12);
+    y += Math.sin(p.flap + (X > 0 ? 0 : Math.PI)) * amp * S * fin;   // side fins beat up & down, out of step
+    x += Math.sin(p.flap * .8 + 1) * amp * .8 * S * tail;            // the tail wags side to side
+    return [p.x + x * c - y * n, p.y + bob + x * n + y * c];
+  };
+  let o = 0;
+  for (let j = 0; j < PG; j++) for (let i = 0; i < PG; i++) {
+    const u0 = i / PG, u1 = (i + 1) / PG, v0 = j / PG, v1 = (j + 1) / PG;
+    for (const [u, v] of [[u0, v0], [u1, v0], [u0, v1], [u1, v0], [u1, v1], [u0, v1]]) { const q = at(u, v); puffV[o++] = q[0]; puffV[o++] = q[1]; puffV[o++] = u; puffV[o++] = v; }
+  }
+  return puffV;
+}
+function drawPuffer(t) {
+  if (!puffer.on || puffTex.length < 4 || puffTex.some(x => !x)) return;
+  const u = clamp(puffer.inf) * 3, k = Math.min(2, Math.floor(u)), f = u - k, over = Math.max(0, puffer.inf - 1);
+  // the shared outline this frame (a touch bigger past fully puffed, for the overshoot)
+  const tw = (PW[k] + (PW[k + 1] - PW[k]) * f) * (1 + over * .6), th = (PH[k] + (PH[k + 1] - PH[k]) * f) * (1 + over * .6);
+  gl.useProgram(meshP.p); gl.uniform2f(meshP.u.res, W, H); gl.bindBuffer(gl.ARRAY_BUFFER, puffBuf);
+  const P = gl.getAttribLocation(meshP.p, 'p'), U = gl.getAttribLocation(meshP.p, 'uv');
+  gl.activeTexture(gl.TEXTURE0); gl.uniform1i(meshP.u.s, 0); gl.uniform1f(meshP.u.pop, 0);
+  const draw = (stage, alpha, shade) => {
+    gl.bufferData(gl.ARRAY_BUFFER, puffMesh(stage, tw, th, t), gl.DYNAMIC_DRAW);
+    gl.enableVertexAttribArray(P); gl.vertexAttribPointer(P, 2, gl.FLOAT, false, 16, 0);
+    gl.enableVertexAttribArray(U); gl.vertexAttribPointer(U, 2, gl.FLOAT, false, 16, 8);
+    gl.bindTexture(gl.TEXTURE_2D, puffTex[stage]); gl.uniform1f(meshP.u.shade, shade ? 1 : 0);
+    if (shade) for (const [dx, dy] of [[0, 0], [6, 5], [-5, 7]]) { gl.uniform2f(meshP.u.off, puffer.S * .04 + dx, puffer.S * .06 + dy - camY); gl.uniform1f(meshP.u.a, .12 * alpha); gl.drawArrays(gl.TRIANGLES, 0, PG * PG * 6); }
+    else { gl.uniform2f(meshP.u.off, 0, -camY); gl.uniform1f(meshP.u.a, alpha); gl.drawArrays(gl.TRIANGLES, 0, PG * PG * 6); }
+  };
+  const b = f * f * (3 - 2 * f);   // the crossfade, eased so neither painting lingers half-there
+  draw(k, 1, true);
+  draw(k, 1 - b, false);
+  if (b > .002) draw(k + 1, b, false);
 }
 function drawLayer(i, src) {
   upload(layerTex[i], src);
@@ -555,6 +753,7 @@ addEventListener('pointerdown', e => {
   const egg = eggAt(e.clientX, e.clientY); if (egg) { window.open(egg, '_blank', 'noopener'); return; }   // the Mordire file
   if (choosePhoto(photoAt(e.clientX, e.clientY))) return;   // a click on the photo behind swaps the pair, not the fleet
   const front = frontAt(e.clientX, e.clientY); if (front) return openPhoto(front);   // the photo up front opens full screen
+  if (puffer.hit(e.clientX, e.clientY + camY)) { const t = clock(); puffer.puff(t); puffer.vy -= 120; ripple(puffer.x, puffer.y, t, 1); return; }   // PUFF-04 balloons
   const hitFish = fleet.find(f => f.spine(16).some(q => Math.hypot(q.x - e.clientX, q.y - (e.clientY + camY)) < f.len * .12));
   if (hitFish) { hitFish.tagUntil = clock() + 5; return; }   // a click on a fish shows its tag for a few seconds
   const t = clock(); ripple(e.clientX, e.clientY + camY, t, 1);
@@ -579,6 +778,8 @@ function layoutWord() {
   let x = W / 2 - total / 2; letterX = widths.map(w => { const c = x + w / 2; x += w + gap; return c; });
   letterX[4] -= wordFont * .09;   // the period tucks in under the P's bowl
 }
+// how far the letters' fill sinks to glass after landing: .93 = see-through glass, 0 = solid (Q 2026-11-05: 75% opaque)
+const SINK = .25;
 function drawWord(t) {
   const g = B.g, m = M.g; g.clearRect(0, 0, W, H); m.clearRect(0, 0, W, H);
   const cy = wordCY - camY; if (cy < -wordFont) return;
@@ -592,12 +793,12 @@ function drawWord(t) {
     g.save(); g.translate(letterX[k], cy - (1 - u) * 40); g.scale(s, s); g.translate(0, capH / 2); g.globalAlpha = u;
     // each letter lands bright, then the fill sinks to glass (Q 2026-11-01): the fish behind it read through, blurred
     // (the frost pass uses M), & a bright red outline holds the shape
-    const sink = still ? .93 : ease((t - LETTER_AT[k] - 1.4) / 1.6) * .93;
+    const sink = still ? SINK : ease((t - LETTER_AT[k] - 1.4) / 1.6) * SINK;
     m.save(); m.translate(letterX[k], cy - (1 - u) * 40); m.scale(s, s); m.translate(0, capH / 2); m.fillStyle = `rgba(255,255,255,${u})`; m.fillText(ch, 0, 0); m.restore();
     g.fillStyle = `rgba(255,42,31,${.55 * (1 - sink * .7)})`; g.fillText(ch, -6 - glitch, 0);
     g.fillStyle = `rgba(0,200,255,${.22 * (1 - sink * .7)})`; g.fillText(ch, 6 + glitch, 0);
     g.shadowColor = 'rgba(255,42,31,.4)'; g.shadowBlur = 60 * (1 - sink); g.fillStyle = dot ? `rgba(255,42,31,${1 - sink})` : `rgba(237,235,228,${1 - sink})`; g.fillText(ch, 0, 0);
-    g.shadowBlur = 0; g.strokeStyle = '#FF2A1F'; g.lineWidth = Math.max(1.5, wordFont * .005) / s; g.globalAlpha = u * sink / .93 * .5; g.strokeText(ch, 0, 0);   // the outline at half strength
+    g.shadowBlur = 0; g.strokeStyle = '#FF2A1F'; g.lineWidth = Math.max(1.5, wordFont * .005) / s; g.globalAlpha = SINK ? u * sink / SINK * .5 : 0; g.strokeText(ch, 0, 0);   // the outline at half strength
     g.restore();
   });
   const n = still ? SUB.length : Math.floor(clamp((t - SUB_AT) / 1.1) * SUB.length);
@@ -1047,12 +1248,17 @@ const pings = []; let actx = null, pin = null;
 function pingSound() {
   try {
     actx = actx || new (window.AudioContext || window.webkitAudioContext)(); if (actx.state === 'suspended') actx.resume();
-    const t = actx.currentTime, o = actx.createOscillator(), g = actx.createGain(), lp = actx.createBiquadFilter(), d = actx.createDelay(), fb = actx.createGain();
-    o.type = 'sine'; o.frequency.setValueAtTime(1500, t); o.frequency.exponentialRampToValueAtTime(1340, t + 1.3);
-    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(.2, t + .006); g.gain.exponentialRampToValueAtTime(.0001, t + 1.5);
-    lp.type = 'lowpass'; lp.frequency.value = 2400; d.delayTime.value = .3; fb.gain.value = .3;
-    o.connect(g); g.connect(lp); lp.connect(actx.destination); lp.connect(d); d.connect(fb); fb.connect(d); d.connect(actx.destination);
-    o.start(t); o.stop(t + 1.6);
+    // a soft bell: G5 with a quiet octave, one steady pitch so it never clashes with its own echo, at half the old
+    // level (Q 2026-11-05: the falling ping, then a chord, were dissonant; "bring the volume down")
+    const t = actx.currentTime, g = actx.createGain(), lp = actx.createBiquadFilter(), d = actx.createDelay(), fb = actx.createGain();
+    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(.1, t + .01); g.gain.exponentialRampToValueAtTime(.0001, t + 1.8);
+    lp.type = 'lowpass'; lp.frequency.value = 2400; d.delayTime.value = .35; fb.gain.value = .22;
+    for (const [hz, v] of [[784, .8], [1568, .2]]) {
+      const o = actx.createOscillator(), m = actx.createGain();
+      o.type = 'sine'; o.frequency.value = hz; m.gain.value = v;
+      o.connect(m); m.connect(g); o.start(t); o.stop(t + 1.9);
+    }
+    g.connect(lp); lp.connect(actx.destination); lp.connect(d); d.connect(fb); fb.connect(d); d.connect(actx.destination);
   } catch (e) {}
 }
 function drawPings(g, t) {
@@ -1191,6 +1397,7 @@ function frame() {
     if (on) el.classList.add('in'); else if (off) el.classList.remove('in'); });
   if (goal && (t > goal.until || fleet.every(f => Math.hypot(f.x - goal.x, f.y - goal.y) < f.len * .55))) goal = null;   // arrived
   updateBarriers(); if (!still && t > FISH_AT) for (const f of [...fleet, ...leavers]) f.step(dt, t); wakes(t);
+  if (!puffer.on && t > PUFF_AT) puffer.enter(); if (!still) puffer.step(dt, t); puffFins(t);
   for (let j = leavers.length - 1; j >= 0; j--) {   // gone once the whole body is off the screen (or after 15 s, whatever happens)
     const f = leavers[j], pad = f.len * .15, out = q => q.x < -pad || q.x > W + pad || q.y - camY < -pad || q.y - camY > H + pad;
     if (still || clock() - f.leaving > 15 || [0, .25, .5, .75, 1].every(u => out(f.pt(f.len * u)))) leavers.splice(j, 1);
@@ -1216,15 +1423,17 @@ function frame() {
   if (fleet[1]) ms[1] = drawFish(fleet[1]);
   if (fleet[2]) ms[2] = drawFish(fleet[2]);
   for (const f of leavers) drawFish(f);
+  drawPuffer(t);
   C.g.clearRect(0, 0, W, H); photoShadows(C.g, t);
   if (fleet[1]) laser(C.g, t, fleet[1], ms[1], 1);
   fleet.forEach((f, k) => tag(C.g, t, f, ms[k], k));
+  puffTag(C.g, t);
   drawLayer(2, C.c);
   gl.bindFramebuffer(gl.FRAMEBUFFER, null); gl.viewport(0, 0, W * DPR, H * DPR); gl.disable(gl.BLEND);
   gl.useProgram(waterP.p); gl.bindBuffer(gl.ARRAY_BUFFER, quad);
   const q = gl.getAttribLocation(waterP.p, 'q'); gl.enableVertexAttribArray(q); gl.vertexAttribPointer(q, 2, gl.FLOAT, false, 0, 0);
   gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, frost ? sceneTex2 : sceneTex); gl.uniform1i(waterP.u.s, 0);
-  gl.uniform2f(waterP.u.res, W, H); gl.uniform1f(waterP.u.t, t); gl.uniform1f(waterP.u.dpr, DPR); gl.uniform1f(waterP.u.cam, camY); gl.uniform4fv(waterP.u.rip, rip); gl.uniform4fv(waterP.u.wake, wake);
+  gl.uniform2f(waterP.u.res, W, H); gl.uniform1f(waterP.u.t, t); gl.uniform1f(waterP.u.dpr, DPR); gl.uniform1f(waterP.u.cam, camY); gl.uniform4fv(waterP.u.rip, rip); gl.uniform4fv(waterP.u.wake, wake); gl.uniform4fv(waterP.u.fin, finRings);
   gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
   // above the water: the photos up front (so the parallax reads cleanly), then frames, captions, pings
   gl.enable(gl.BLEND); gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);

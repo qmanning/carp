@@ -31,17 +31,24 @@ It won't run from `file://` (WebGL blocks the textures). If you change something
 |---|---|
 | `index.html` | The whole site: HTML, CSS & a WebGL2 engine. No build step, no dependencies. |
 | `assets/fish-1.png` to `fish-3.png` | KOI-class, SILURUS (the catfish) & the tuna, painted top-down |
+| `assets/puffer-1.png` to `puffer-4.png` | BigPuffa (PUFF-04), deflated to fully puffed: four stages on one canvas & one centre |
 | `assets/photos/` | 11 fake "archival" photos, each split into a background (`-bg.jpg`) & a cutout (`-fg.webp`) |
-| `assets/og.jpg` | The share card |
 
 ## How it works
 
 - **It isn't 3D.** Each fish is a flat painted PNG drawn as a textured strip that bends as it swims, so the whole body turns, not just the head.
 - **No orbiting.** Each fish wanders (Reynolds-style steering): it picks a spot in its zone, swims there, glides for a beat, then picks another, & it steers around the copy.
-- **One water shader over everything:** wobble, ripples, drifting caustic light & a hair of chromatic aberration. The giant CARP letters are frosted glass: whatever swims behind them comes through blurred.
+- **One water shader over everything:** wobble, ripples, drifting caustic light & a hair of chromatic aberration. The giant CARP letters land bright, then settle at 75%, so whatever swims behind them shows through, blurred.
 - **Lasers are drawn in code**, not painted into the art, so they can sweep or lock onto each section's target.
 - **The archive photos are plates.** Each one is a cutout (BiRefNet via rembg) over a background with the people painted out (LaMa via IOPaint), so the people sit on their own plane, with pencil-sketch lines drawn in behind them.
 - **Eight scroll sections**, from Infiltrate to Request clearance. The yellow button under each section's copy moves you to the next.
+- **The sounds are synthesised**, no audio files: clicking the water plays a soft bell (G5 & its octave) with an echo; deploying the tuna sounds a klaxon.
+
+## BigPuffa
+
+PUFF-04 // Countermeasures, known affectionately as BigPuffa. He doesn't swim like the others: his fins buzz, he gets nowhere fast & leaves the tiniest ripples, & he keeps away from the fleet. When a fish bumps him he puffs up, & stays puffed until nothing has hit him for three seconds (`PUFF_CALM`); then he deflates like a let-go balloon, zipping about on the escaping air. Puffed, the fleet steers around his spines. Click him to puff him yourself.
+
+He's four paintings on one canvas. Between two stages both are stretched to the same outline & crossfaded, so he morphs instead of fading, & a small mesh flutters his fins & tail. Send the fleet at him & see if you can make him lose his cool.
 
 ## Make your own fish
 
@@ -71,7 +78,7 @@ Inspired by [Marina Budarina](https://budarina-koi.runable.site)'s koi. Go play 
 
 ## License
 
-The code (`index.html`) is MIT. The art (everything in `assets/`: the fish, the photos & the share card) is [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/): free for non-commercial use, with credit. See [LICENSE](LICENSE).
+The code (`index.html`) is MIT. The art (everything in `assets/`: the fish, BigPuffa & the photos) is [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/): free for non-commercial use, with credit. See [LICENSE](LICENSE).
 
 ---
 
