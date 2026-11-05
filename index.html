@@ -1,0 +1,1239 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CARP | Covert Aquatic Reconnaissance Platforms</title>
+<meta name="description" content="Covert surveillance fish for allied governments, private estates & sensitive water features. Nobody suspects the fish.">
+<meta name="theme-color" content="#0b0a0a">
+<!-- share card: the intro at 5.6 s (koi nose-down over the C, catfish nose-up, lasers on), rendered frame-exact at 1200x630 -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Q Manning">
+<meta property="og:url" content="https://www.qmanning.com/labs/carp">
+<meta property="og:title" content="CARP | Covert Aquatic Reconnaissance Platforms">
+<meta property="og:description" content="Covert surveillance fish for allied governments, private estates & sensitive water features. Nobody suspects the fish.">
+<meta property="og:image" content="https://www.qmanning.com/labs/carp/assets/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="CARP. An armored koi dives over the big stencil letters while an armored catfish rises below, both firing lasers, over the line Lethal. Listening. Wet.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="CARP | Covert Aquatic Reconnaissance Platforms">
+<meta name="twitter:description" content="Covert surveillance fish for allied governments, private estates & sensitive water features. Nobody suspects the fish.">
+<meta name="twitter:image" content="https://www.qmanning.com/labs/carp/assets/og.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Stencil+Display:wght@800;900&family=Inter+Tight:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  /* CARP: Covert Aquatic Reconnaissance Platforms (koi are carp). The series joke: creators one-prompt gorgeous
+     interactive sites that make no sense for the brand; what if the brief DID match the design? CARP sells armored
+     attack fish for surveillance: KOI-class & SILURUS, the catfish (nobody makes pretty sites about catfish).
+     Q 2026-11-01: a WOW one-shot, military, garish, expensive. One WebGL water pass over the whole scene; the fish are
+     textured meshes bent along their path. A hero & eight story sections: the fish swim down first & pull the eye to
+     each next one, then show what they do there. Click anywhere to send them to that point. Fish art: assets/fish-1.png
+     (koi), assets/fish-2.png (catfish), assets/fish-3.png (the tuna, the 3rd unit), top-down, head up. */
+  :root { --gm: max(40px, 5vw);   /* the grid margin: 12 columns between two of these */
+    --bg: #050505; --ink: #EDEBE4; --soft: #8A8A84; --red: #FF2A1F; --amber: #FFB800; --line: rgba(237, 235, 228, .16); }
+  html { scrollbar-width: none; }
+  html::-webkit-scrollbar { display: none; }
+  html, body { margin: 0; background: var(--bg); color: var(--ink); font-family: 'Inter Tight', system-ui, sans-serif; }
+  #gl { position: fixed; inset: 0; width: 100vw; height: 100vh; display: block; z-index: 0; }
+  .fx { position: fixed; inset: 0; z-index: 5; pointer-events: none;
+    background: repeating-linear-gradient(0deg, rgba(0,0,0,.2) 0 1px, transparent 1px 3px), radial-gradient(ellipse at 50% 48%, transparent 50%, rgba(0,0,0,.7) 100%); }
+  .frame { position: fixed; inset: 14px; z-index: 4; pointer-events: none; border: 1px solid rgba(237,235,228,.07); opacity: 0; transition: opacity .8s; }
+  .frame i { position: absolute; width: 26px; height: 26px; border: 2px solid var(--amber); }
+  .frame i:nth-child(1) { top: -2px; left: -2px; border-right: 0; border-bottom: 0; } .frame i:nth-child(2) { top: -2px; right: -2px; border-left: 0; border-bottom: 0; }
+  .frame i:nth-child(3) { bottom: -2px; left: -2px; border-right: 0; border-top: 0; } .frame i:nth-child(4) { bottom: -2px; right: -2px; border-left: 0; border-top: 0; }
+  .mono { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; }
+  .ui { position: fixed; z-index: 6; }
+  .classified { top: 0; left: 0; right: 0; height: 20px; background: var(--red); color: #000; display: grid; place-items: center; font-weight: 700; letter-spacing: .4em; transform: translateY(-100%); transition: transform .5s cubic-bezier(.2,.8,.2,1); }
+  nav { top: 20px; left: 0; right: 0; display: flex; align-items: center; justify-content: space-between; padding: 18px 34px; }
+  nav .mark { font-family: 'Big Shoulders Stencil Display', sans-serif; font-weight: 900; font-size: 30px; letter-spacing: .08em; cursor: pointer; }
+  nav .mark b, .red { color: var(--red); }
+  nav .links { display: flex; gap: 30px; color: var(--soft); }
+  nav .links a { color: inherit; text-decoration: none; cursor: pointer; } nav .links a:hover, nav .links a.on { color: var(--amber); }
+  .tele { top: 92px; right: 34px; text-align: right; line-height: 1.6; color: var(--soft); min-width: 140px; font-size: 6.5px; letter-spacing: .16em; opacity: .7; }   /* ambience, not for reading */
+  .tele b { color: var(--amber); font-weight: 700; } .tele .r { color: var(--red); }
+  /* the panes ride the same camera as the WebGL world (translated each frame); #spacer gives the page its scroll length */
+  main { position: fixed; top: 0; left: 0; right: 0; z-index: 6; pointer-events: none; will-change: transform; }
+  .pane { height: 100vh; position: relative; }
+  .pane .copy { position: absolute; left: var(--gm); bottom: 134px; max-width: 600px; pointer-events: auto; }
+  #p0 .copy { max-width: 780px; }   /* the hero headline holds one line at its 72 px max ("WET." was orphaned on wide screens) */
+  .pane .copy.right { left: auto; right: var(--gm); text-align: right; }
+  .pane .tag { color: var(--red); margin-bottom: 12px; min-height: 14px; }
+  .pane h2 { margin: 0 0 14px; font-family: 'Big Shoulders Stencil Display', sans-serif; font-weight: 900; font-size: clamp(36px, 4.4vw, 72px); line-height: .86; letter-spacing: .01em; text-transform: uppercase; }
+  .pane p { margin: 0 0 22px; color: var(--soft); font-size: 15px; line-height: 1.5; max-width: 430px; text-wrap: pretty; }   /* no orphans */
+  .pane .copy.right p { margin-left: auto; }
+  .pane.photo .copy, #p2 .copy { top: calc((116px + 100vh - 140px) / 2); bottom: auto; transform: translateY(-50%); max-width: min(520px, calc((100vw - 2 * var(--gm)) / 12 * 4.2)); }
+  .pane .brief { list-style: none; padding: 0; margin: -6px 0 22px; color: var(--amber); line-height: 2; }
+  .pane .brief li::before { content: '▸ '; color: var(--red); }
+  /* 02 // the dam: a survey sheet drawn on like a pen plotter, then the people on it get tracked */
+  .dam { position: absolute; inset: 0; pointer-events: none; }   /* a red survey sheet, full bleed (Q 2026-11-01) */
+  .dam svg { display: block; width: 100%; height: 100%; }
+  .dam .d { stroke-dasharray: 1; stroke-dashoffset: 1; }
+  .dam .f, .dam text { opacity: 0; }
+  .dam text { font-family: 'JetBrains Mono', monospace; font-size: 8.5px; letter-spacing: .14em; fill: rgba(255,70,50,.8); }
+  .dam .trk { opacity: 0; }
+  #p2 .copy { text-shadow: 0 2px 18px #050505, 0 0 42px #050505, 0 0 80px #050505; }
+  .dam .trk text { font-size: 8.5px; font-weight: 700; fill: #FFB800; opacity: 1; } .dam .trk .l text { text-anchor: end; transform: translateX(-38px); } .dam .trk .hot text { fill: #FF2A1F; }
+  .stat { position: absolute; bottom: 116px; pointer-events: none; }
+  .stat.l { left: 34px; } .stat.r { right: 34px; text-align: right; }
+  .stat b { display: block; font-family: 'Big Shoulders Stencil Display', sans-serif; font-weight: 900; font-size: clamp(80px, 11vw, 170px); line-height: .8; color: transparent; -webkit-text-stroke: 1.5px rgba(237,235,228,.55); }
+  .stat span { color: var(--red); }
+  .in .stat { opacity: 1; transform: none; transition-delay: .3s; }
+  .stat { opacity: 0; transform: translateY(16px); transition: opacity 1s, transform 1s cubic-bezier(.2,.8,.2,1); }
+  /* the real call to action sits under each section's copy & advances the story: solid yellow */
+  .adv { background: var(--amber); color: #000; border-color: var(--amber); font-weight: 700; box-shadow: 0 0 22px rgba(255,184,0,.4); }
+  .adv:hover { background: var(--ink); border-color: var(--ink); }   /* yellow = go (red reads as don't touch) */
+  .adv span { display: inline-block; animation: bob 1.4s ease-in-out infinite; }
+  @keyframes bob { 50% { transform: translateY(4px); } }
+  #p0 .quiet { position: absolute; top: 92px; left: 34px; pointer-events: auto; border: 0; padding: 0; color: var(--soft); font-size: 10px; }
+  #p0 .quiet:hover { background: none; color: var(--amber); }
+  /* the scroll watcher: calm "scroll to continue" at a story stop, louder "keep scrolling" (with the section's progress) mid-story */
+  .ui.watch { position: fixed; z-index: 7; left: 0; right: 0; margin: 0 auto; width: max-content; bottom: 52px; display: flex; flex-direction: column; align-items: center; gap: 9px;
+    color: var(--soft); font-size: 10px; letter-spacing: .24em; pointer-events: none; transition: color .35s, opacity .7s, transform .7s cubic-bezier(.2,.8,.2,1); }
+  .watch b { font-weight: 400; transition: font-size .35s, letter-spacing .35s; }
+  .watch .mouse { width: 14px; height: 22px; border: 1.5px solid currentColor; border-radius: 8px; position: relative; opacity: .8; }
+  .watch .mouse i { position: absolute; left: 50%; top: 4px; width: 2px; height: 5px; margin-left: -1px; border-radius: 1px; background: currentColor; animation: wheel 1.8s ease-in-out infinite; }
+  @keyframes wheel { 0% { opacity: 0; transform: none; } 30% { opacity: 1; } 80%, 100% { opacity: 0; transform: translateY(8px); } }
+  .watch .bar { width: 96px; height: 2px; background: rgba(237,235,228,.14); overflow: hidden; opacity: 0; transition: opacity .35s; }
+  .watch .bar i { display: block; height: 100%; background: var(--ink); transform-origin: left; transform: scaleX(0); }
+  .watch.mid { color: var(--ink); text-shadow: 0 0 18px rgba(237,235,228,.45); }
+  .watch.mid b { font-weight: 700; font-size: 13px; letter-spacing: .3em; }
+  .watch.mid .mouse { animation: nudge .9s ease-in-out infinite; } .watch.mid .mouse i { animation-duration: .9s; } .watch.mid .bar { opacity: 1; }
+  @keyframes nudge { 50% { transform: translateY(5px); } }
+  .ui.watch.move { opacity: .2; }   /* a button is already taking you there */
+  .watch.end { pointer-events: auto; cursor: pointer; bottom: 84px; }   /* clear of the closing footer line */ .watch.end .mouse { display: none; } .watch.end:hover { color: var(--amber); }
+  button { font: inherit; color: inherit; background: transparent; border: 1px solid var(--line); padding: 12px 18px; cursor: pointer; }
+  button:hover { background: var(--amber); color: #000; border-color: var(--amber); }
+  .solid { background: var(--red); color: #000; border-color: var(--red); font-weight: 700; box-shadow: 0 0 30px rgba(255,42,31,.45); } .solid:hover { background: var(--amber); }
+  .br { right: 34px; bottom: 66px; text-align: right; color: var(--soft); line-height: 2; }
+  .br span { display: flex; align-items: center; justify-content: flex-end; }
+  .br button { width: 34px; padding: 8px 0; } .br button.maxed { opacity: .3; } .br b { font-weight: 700; color: var(--amber); padding: 0 12px; }
+  .ticker { left: 0; right: 0; bottom: 0; height: 30px; overflow: hidden; border-top: 1px solid rgba(255,184,0,.35);
+    background: repeating-linear-gradient(-45deg, rgba(255,184,0,.12) 0 10px, transparent 10px 20px), #050505; }
+  .ticker div { position: absolute; white-space: nowrap; line-height: 30px; color: var(--amber); animation: tick 40s linear infinite; }
+  @keyframes tick { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+  .swap { display: flex; align-items: center; gap: 12px; color: var(--soft); opacity: 0; pointer-events: none; transition: opacity .3s; }
+  .swap.on { opacity: 1; pointer-events: auto; } .swap button { width: 34px; padding: 6px 0; color: var(--amber); border-color: rgba(255,184,0,.45); }
+  .pager { left: 14px; top: 50%;   /* in the margin, clear of the copy at 34px */ transform: translateY(-50%); display: grid; gap: 10px; }
+  .pager i { width: 8px; height: 2px; background: rgba(237,235,228,.25); transition: width .4s, background .4s; }
+  .pager i.on { width: 16px; background: var(--red); }
+  /* choreography: everything starts hidden; the timeline / the pane coming into view adds .in */
+  .late { opacity: 0; transform: translateY(12px); transition: opacity .7s, transform .7s cubic-bezier(.2,.8,.2,1); }
+  .late.in, .in .late { opacity: 1; transform: none; }
+  .in .late:nth-child(3) { transition-delay: .6s; } .in .late:nth-child(4) { transition-delay: .9s; }
+  .chars .c { display: inline-block; opacity: 0; transform: translateY(.55em) rotate(4deg); filter: blur(10px); }
+  .in .chars .c, .chars.in .c { animation: rise .7s cubic-bezier(.2,.9,.2,1) forwards; animation-delay: calc(var(--i) * 34ms); }
+  @keyframes rise { to { opacity: 1; transform: none; filter: blur(0); } }
+  .on .classified { transform: none; } .on .frame { opacity: 1; }
+  /* sections: the copy cuts in fast behind slanted masks, one piece after another, a red slash leading the headline */
+  .pane:not(#p0) .chars .c { opacity: 1; transform: none; filter: none; animation: none; }
+  .pane:not(#p0) .copy > * { clip-path: polygon(-2% -12%, -2% -12%, -34% 112%, -34% 112%); transform: translateX(-16px); opacity: 1;
+    transition: clip-path .5s cubic-bezier(.75,0,.2,1), transform .5s cubic-bezier(.2,.8,.2,1); }
+  .pane:not(#p0) .copy.right > * { clip-path: polygon(102% -12%, 102% -12%, 134% 112%, 134% 112%); transform: translateX(16px); }
+  .pane.in:not(#p0) .copy > * { clip-path: polygon(-2% -12%, 134% -12%, 102% 112%, -34% 112%); transform: none; }
+  .pane.in:not(#p0) .copy.right > * { clip-path: polygon(-34% -12%, 102% -12%, 134% 112%, -2% 112%); }
+  .pane:not(#p0) .copy > .adv { clip-path: polygon(-6% -60%, -6% -60%, -40% 160%, -40% 160%); }   /* roomier masks so the glow isn't cut */
+  .pane:not(#p0) .copy.right > .adv { clip-path: polygon(106% -60%, 106% -60%, 140% 160%, 140% 160%); }
+  .pane.in:not(#p0) .copy > .adv { clip-path: polygon(-6% -60%, 140% -60%, 106% 160%, -40% 160%); transition-delay: .36s; }
+  .pane.in:not(#p0) .copy.right > .adv { clip-path: polygon(-40% -60%, 106% -60%, 140% 160%, -6% 160%); }
+  .pane.in:not(#p0) .copy > :nth-child(2) { transition-delay: .07s; } .pane.in:not(#p0) .copy > :nth-child(3) { transition-delay: .17s; } .pane.in:not(#p0) .copy > :nth-child(4) { transition-delay: .26s; }
+  .pane:not(#p0) h2 { position: relative; }
+  .pane:not(#p0) h2::after { content: ''; position: absolute; top: -4%; bottom: -4%; left: 0; width: 34%; background: var(--red); opacity: 0; pointer-events: none; }
+  .pane.in:not(#p0) h2::after { animation: slash .55s cubic-bezier(.7,0,.25,1) .05s; }
+  .pane.in:not(#p0) .copy.right h2::after { animation-name: slashL; }
+  @keyframes slash { from { opacity: 1; transform: translateX(-130%) skewX(-22deg); } 85% { opacity: 1; } to { opacity: 0; transform: translateX(320%) skewX(-22deg); } }
+  @keyframes slashL { from { opacity: 1; transform: translateX(320%) skewX(-22deg); } 85% { opacity: 1; } to { opacity: 0; transform: translateX(-130%) skewX(-22deg); } }
+  footer { position: absolute; left: 0; right: 0; bottom: 40px; text-align: center; color: rgba(237,235,228,.35); }
+  /* the / wipe: jumping more than one section away cuts behind a slanted panel instead of scrolling the whole way */
+  .wipe { position: fixed; z-index: 9; top: -15vh; bottom: -15vh; left: -25vw; width: 150vw; background: #050505; pointer-events: none;
+    border-left: 10px solid var(--red); border-right: 10px solid var(--red); box-shadow: 0 0 80px rgba(255,42,31,.45);
+    display: grid; place-items: center; transform: translateX(-140%) skewX(-18deg); }
+  .wipe[data-dir="up"] { transform: translateX(140%) skewX(-18deg); }
+  .wipe span { transform: skewX(18deg); color: var(--red); }
+  .wipe.in { transform: translateX(0) skewX(-18deg) !important; transition: transform .36s cubic-bezier(.75,0,.3,1); }
+  .wipe.out { transition: transform .44s cubic-bezier(.7,0,.25,1); }
+  .wipe.out[data-dir="down"] { transform: translateX(140%) skewX(-18deg); } .wipe.out[data-dir="up"] { transform: translateX(-140%) skewX(-18deg); }
+  /* flash traffic: the urgent toast when the tuna is deployed */
+  .flash { position: fixed; z-index: 8; top: 96px; left: 0; right: 0; margin: 0 auto; width: min(560px, calc(100vw - 32px)); background: #0A0606; border: 2px solid var(--red);
+    box-shadow: 0 0 60px rgba(255,42,31,.5); transform: translateY(-30px); opacity: 0; pointer-events: none; transition: transform .35s cubic-bezier(.2,.9,.2,1), opacity .35s; }
+  .flash.on { transform: none; opacity: 1; animation: alarm .5s steps(1) 6; }
+  @keyframes alarm { 50% { border-color: var(--amber); box-shadow: 0 0 80px rgba(255,184,0,.45); } }
+  .flash .hz { height: 14px; background: repeating-linear-gradient(-45deg, var(--red) 0 12px, #000 12px 24px); }
+  .flash .in2 { padding: 16px 22px 18px; }
+  .flash .mono { color: var(--red); display: flex; justify-content: space-between; }
+  .flash h4 { margin: 8px 0 2px; font-family: 'Big Shoulders Stencil Display', sans-serif; font-weight: 900; font-size: 34px; line-height: .95; text-transform: uppercase; color: var(--ink); }
+  .flash h4.y { color: var(--amber); font-size: 46px; }
+  dialog { border: 1px solid var(--red); padding: 44px 48px; max-width: 540px; background: #0A0606; color: var(--ink); box-shadow: 0 0 80px rgba(255,42,31,.25); }
+  /* the lightbox: the front photo, full screen, in the same amber frame corners; Esc, the button or a click anywhere closes it */
+  dialog.lb { max-width: none; max-height: none; width: 100vw; height: 100vh; margin: 0; padding: 0; border: 0; background: rgba(5,5,5,.94); box-shadow: none; cursor: zoom-out; }
+  dialog.lb[open] { display: grid; place-items: center; place-content: center; gap: 18px; }
+  .lb canvas { display: block; max-width: calc(100vw - 96px); max-height: calc(100vh - 150px); outline: 1px solid rgba(255,184,0,.55); outline-offset: 8px; }
+  .lb #lbCap { color: var(--soft); text-align: center; max-width: calc(100vw - 96px); }
+  .lb form { position: fixed; top: 28px; right: 34px; } dialog.lb button { color: var(--ink); }   /* not red: closing is fine */
+  dialog::backdrop { background: rgba(0, 0, 0, .65); backdrop-filter: blur(4px); }
+  dialog .mono { color: var(--red); }
+  dialog h3 { font-family: 'Big Shoulders Stencil Display', sans-serif; font-weight: 900; font-size: 52px; line-height: .92; margin: 14px 0 16px; text-transform: uppercase; }
+  dialog p { color: var(--soft); line-height: 1.55; margin: 0 0 26px; }
+  @media (max-width: 760px) { .pane.photo .copy, #p2 .copy { max-width: none; } nav .links, .tele, .br, .pager { display: none; } .pane .copy, .pane .copy.right { left: 24px; right: 24px; text-align: left; } }
+  @media (prefers-reduced-motion: reduce) { .ticker div { animation: none; } .chars .c, .late { opacity: 1; transform: none; filter: none; animation: none; } }
+</style>
+</head>
+<body>
+<canvas id="gl"></canvas>
+<div class="frame"><i></i><i></i><i></i><i></i></div>
+<div class="fx"></div>
+
+<div class="ui classified mono">Top secret // noforn // carp-aq</div>
+<nav class="ui mono"><div class="mark late" id="home">CARP<b>.</b></div><div class="links late"><a data-go="1">Infiltrate</a><a data-go="2">Hold</a><a data-go="3">Protect</a><a data-go="4">Designate</a><a data-go="5">Heritage</a></div><button class="late" id="demo">Request a demo</button></nav>
+<div class="ui tele mono" id="tele"></div>
+<div class="ui pager late" id="pager"><i class="on"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+<div class="ui br mono late" id="units">Click to direct the fleet<span><button id="less" aria-label="Fewer units">–</button><b id="count">2 units deployed</b><button id="more" aria-label="More units">+</button></span></div>
+<div class="ui watch mono late rest" id="watch"><i class="mouse"><i></i></i><b id="watchT">Scroll to continue</b><i class="bar"><i id="watchBar"></i></i></div>
+<div class="ui swap mono" id="swap"><button id="swapPrev" aria-label="Previous photo">←</button><span id="swapN">1 / 2</span><button id="swapNext" aria-label="Next photo">→</button></div>
+<div class="ui ticker mono late" id="ticker"><div id="tick"></div></div>
+
+<div id="spacer"></div>
+<main>
+  <section class="pane" id="p0">
+    <div class="copy"><div class="tag mono" id="story"></div><h2 class="chars" id="headline">Lethal. Listening. <span class="red">Wet.</span></h2><p class="late" id="lede">Covert surveillance fish for allied governments, private estates & sensitive water features. Nobody suspects the fish.</p><button class="mono late adv" id="brief" data-go="1"><span>▼</span> Next: Infiltrate</button></div>
+    <button class="mono late quiet" id="clear">Request clearance ↗</button>
+  </section>
+  <section class="pane photo" id="p1" data-photo="mayor" data-side="l" data-cap="Fig. 01 // Aquarium dedication, March 1934 // asset in frame" data-target=".376,.385,.1,.17" data-egg="https://www.youtube.com/watch?v=sIee3S-4jtY&t=1793s" data-intel="Subject identified // 98.6% match|Duke Jonathan Mordire|Despotic leader of Kergkakistan|Assassinated April 1934 // agent unknown">
+    <div class="copy right"><div class="tag mono">01 // KOI-class // Covert ops</div><h2 class="chars">Infiltrate.</h2><p class="late">Glasses, nose & mustache ship standard. Wherever the mission takes them, CARP units blend in: civic aquariums, ribbon cuttings, the mayor’s own tank.</p><ul class="brief mono late"><li>Disguise kit included</li><li>Facial recognition at 30 m</li><li>Nobody suspects the fish</li></ul><button class="mono adv" data-go="2"><span>▼</span> Next: Hold the bottom</button></div>
+  </section>
+  <section class="pane" id="p2" data-dam>
+    <div class="dam" id="dam"></div>
+    <div class="copy"><div class="tag mono">02 // SILURUS // Infrastructure</div><h2 class="chars">Hold the <span class="red">bottom.</span></h2><p class="late">Parked at the base of the dam, one SILURUS unit hears every footstep on the crest at forty meters. Mud-grade camouflage. Zero beauty by design.</p><ul class="brief mono late"><li>Barbel-array sonar</li><li>Tracks seven targets at once</li><li>Holds station for 90 days</li></ul><button class="mono adv" data-go="3"><span>▼</span> Next: Hold the line</button></div>
+  </section>
+  <section class="pane photo" id="p3" data-photo="bouncer,police" data-depth="1,1" data-side="r" data-cap="Fig. 03 // Door control, 1977 // pressure-rated to 1,200 m|Fig. 03b // Night patrol, Precinct 9 // ride-along">
+    <div class="copy"><div class="tag mono">03 // Security & law enforcement</div><h2 class="chars">Hold<br>the <span class="red">line.</span></h2><p class="late">Close protection for embassies, galas & velvet ropes. Off the door, CARP units walk the beat: eight arms on the radio, one fin on the wheel, zero coffee breaks.</p>
+    <ul class="brief mono late"><li>Executive protection</li><li>Night patrol</li><li>Now recruiting: CARP Police Academy</li></ul><button class="mono adv" data-go="4"><span>▼</span> Next: Designate</button></div>
+  </section>
+  <section class="pane photo" id="p4" data-photo="humvee,volley" data-side="l" data-cap="Fig. 04 // Forward deployment // tank-mounted|Fig. 04b // Fleet recreation day, Miramar, 1986 // volleyball">
+    <div class="copy right"><div class="tag mono">04 // Joint operations</div><h2 class="chars">Designate.</h2><p class="late">Embedded with allied ground forces. Each unit rides in its own armored tank, paints the target, then crushes it at beach volleyball on Sundays.</p><ul class="brief mono late"><li>Tank-mounted & road-ready</li><li>Laser designation to 2 km</li><li>Need heavy support? Press +</li></ul><button class="mono adv" data-go="5"><span>▼</span> Next: First wave</button></div>
+  </section>
+  <section class="pane photo" id="p5" data-photo="normandy,warroom,trench" data-depth="1,0,0" data-side="r" data-cap="Fig. 05 // Normandy, June 1944 // first wave|Fig. 05b // War room, May 1944 // Fleet Adm. B. Whale presiding|Fig. 05c // Western Front, 1917 // trench diver, catfish class">
+    <div class="copy"><div class="tag mono">05 // Heritage // Operation Carp</div><h2 class="chars">First <span class="red">wave.</span></h2><p class="late">Normandy, 1944. Fish in brass diving suits went ashore first, on a plan from Fleet Admiral Bartholomew Whale: four stars, one blowhole. Veterans of the 1917 trenches led the way.</p>
+    <ul class="brief mono late"><li>400 units ashore in 11 minutes</li><li>First through the beach obstacles</li><li>Use the arrows for more from the front</li></ul><button class="mono adv" data-go="6"><span>▼</span> Next: Unveiled once</button></div>
+  </section>
+  <section class="pane photo" id="p6" data-photo="expo,plate" data-side="l" data-cap="Fig. 06 // The Great Exhibition, London, 1851|Plate I // Aquatic armour, experimental articulated apparatus, 1885">
+    <div class="copy right"><div class="tag mono">06 // Heritage</div><h2 class="chars">Unveiled <span class="red">once.</span></h2><p class="late">London, 1851. Shown to the public once at the Great Exhibition, then classified. The 1885 plates survive: cranial collar, articulated plates & a pressure gauge good to 50 ft of water.</p><ul class="brief mono late"><li>Six-part articulated armour</li><li>Monocle on a retaining chain</li><li>Top hat fitted with underwater strap</li></ul><button class="mono adv" data-go="7"><span>▼</span> Next: Since 1509</button></div>
+  </section>
+  <section class="pane photo" id="p7" data-photo="venice" data-side="r" data-cap="Fig. 07 // Grand Canal, Venice, 1509">
+    <div class="copy"><div class="tag mono">07 // Heritage</div><h2 class="chars">Since <span class="red">1509.</span></h2><p class="late">Our oldest contract: a sworn koi in the service of the Doge of Venice. Paid in gold, fed in silver & still on retainer five centuries later.</p><ul class="brief mono late"><li>Commissioned 1509</li><li>Canal patrol & state ceremony</li><li>Mustache grandfathered in</li></ul><button class="mono adv" data-go="8"><span>▼</span> Next: Request clearance</button></div>
+  </section>
+  <section class="pane" id="p8">
+    <div class="copy"><div class="tag mono">08 // Procurement</div><h2 class="chars">Request <span class="red">clearance.</span></h2><p class="late">Demonstrations are held in a secure pond. Bring clearance & a towel. Units ship worldwide in unmarked aquariums within six to eight weeks.</p><ul class="brief mono late"><li>Three platforms: KOI, SILURUS & TUNA</li><li>Financing for allied governments</li><li>Ponds sold separately</li></ul><button class="mono adv" id="brief2">Request clearance ↗</button></div>
+    <footer class="mono">CARP // Covert Aquatic Reconnaissance Platforms // fictional, probably</footer>
+  </section>
+</main>
+
+<div class="wipe mono" id="wipe" data-dir="down"><span id="wipeT">Rerouting</span></div>
+<div class="flash" id="flash" role="alert"><div class="hz"></div><div class="in2"><div class="mono"><span>⚠ Urgent // flash traffic</span><span id="flashT">--:--:--Z</span></div><h4>Major artillery inbound.</h4><h4 class="y">BLUETUNA INCOMING.</h4></div><div class="hz"></div></div>
+<dialog id="lb" class="lb" aria-label="Photo"><canvas id="lbC"></canvas><div class="mono" id="lbCap"></div><form method="dialog"><button class="mono" aria-label="Close photo">Close ✕</button></form></dialog>
+<dialog id="dlg"><div class="mono" id="dk">Briefing</div><h3 id="dh"></h3><p id="dp"></p><form method="dialog"><button class="mono">Return to operations</button></form></dialog>
+
+<script>
+const TAU = Math.PI * 2, clamp = (x, a = 0, b = 1) => Math.max(a, Math.min(b, x)), ease = u => 1 - Math.pow(1 - clamp(u), 3);
+const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const canvas = document.getElementById('gl');
+const gl = canvas.getContext('webgl2', { antialias: true, premultipliedAlpha: true, alpha: false });
+let W = 0, H = 0, DPR = 1, camY = 0;
+
+// ---------- 2D layers, uploaded as textures each frame ----------
+// A sonar backdrop · D the koi's laser (under the word, like the koi) · B the giant word · C the catfish's laser & HUD
+const layer = () => { const c = document.createElement('canvas'); return { c, g: c.getContext('2d') }; };
+const A = layer(), B = layer(), C = layer(), D = layer(), E = layer(), M = layer();   // M: the letters' solid shapes (where the glass frosts)   // E: over the photos (frames, captions, click pings)
+
+// ---------- WebGL plumbing ----------
+function sh(type, src) { const s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s); if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) throw gl.getShaderInfoLog(s); return s; }
+function prog(vs, fs) { const p = gl.createProgram(); gl.attachShader(p, sh(gl.VERTEX_SHADER, vs)); gl.attachShader(p, sh(gl.FRAGMENT_SHADER, fs)); gl.linkProgram(p); if (!gl.getProgramParameter(p, gl.LINK_STATUS)) throw gl.getProgramInfoLog(p); const u = {}; const n = gl.getProgramParameter(p, gl.ACTIVE_UNIFORMS); for (let i = 0; i < n; i++) { const a = gl.getActiveUniform(p, i); u[a.name.replace('[0]', '')] = gl.getUniformLocation(p, a.name); } return { p, u }; }
+const QUAD_VS = `#version 300 es
+in vec2 q; out vec2 v; void main() { v = q * .5 + .5; gl_Position = vec4(q, 0, 1); }`;
+const layerP = prog(QUAD_VS, `#version 300 es
+precision mediump float; in vec2 v; out vec4 o; uniform sampler2D s; uniform float a;
+void main() { o = texture(s, vec2(v.x, 1. - v.y)) * a; }`);
+// a fish: a textured strip in screen pixels; shadow mode draws it as a dark silhouette
+const meshP = prog(`#version 300 es
+in vec2 p; in vec2 uv; out vec2 t; uniform vec2 res; uniform vec2 off;
+void main() { t = uv; vec2 c = (p + off) / res * 2. - 1.; gl_Position = vec4(c.x, -c.y, 0, 1); }`, `#version 300 es
+precision mediump float; in vec2 t; out vec4 o; uniform sampler2D s; uniform float shade; uniform float a;
+void main() { vec4 c = texture(s, t); o = shade > .5 ? vec4(0, 0, 0, c.a) * a : c * a; }`);
+// the water over everything: wobble, ripples, drifting caustic light & a hair of chromatic aberration
+const waterP = prog(QUAD_VS, `#version 300 es
+precision highp float; in vec2 v; out vec4 o;
+uniform sampler2D s; uniform vec2 res; uniform float t; uniform float dpr; uniform float cam; uniform vec4 rip[10]; uniform vec4 wake[16];
+float caust(vec2 p, float t) {
+  float c = 0.;
+  for (int i = 0; i < 4; i++) {
+    float a = float(i) * 1.93 + .4; vec2 d = vec2(cos(a), sin(a));
+    float w = dot(p, d) + sin(dot(p, vec2(-d.y, d.x)) * 1.31 + t * (.5 + .13 * float(i))) * .95 + t * .35;
+    c += pow(1. - abs(sin(w)), 22.);
+  }
+  return c;
+}
+void main() {
+  vec2 px = vec2(v.x, 1. - v.y) * res;
+  vec2 wpx = px + vec2(0, cam);                                  // the water scrolls with the page
+  vec2 d = vec2(sin(wpx.y * .017 + t * 1.1) + sin(wpx.y * .029 - t * .8), cos(wpx.x * .014 + t * .9) + cos(wpx.x * .026 + t * 1.25)) * .8;
+  for (int i = 0; i < 10; i++) {
+    vec4 r = rip[i]; float age = t - r.z; if (age < 0. || age > 3.2 || r.w <= 0.) continue;
+    vec2 dd = wpx - r.xy; float dist = length(dd), front = age * 300.;
+    float w = exp(-pow((dist - front) / 46., 2.)) * (1. - age / 3.2) * r.w;
+    d += normalize(dd + .001) * sin((dist - front) * .11) * w * 18.;
+  }
+  float glint = 0.;
+  for (int i = 0; i < 16; i++) {   // rings off the fishes' tails: smaller & shorter-lived than a click's, with a faint glint on the crest
+    vec4 r = wake[i]; float age = t - r.z; if (age < 0. || age > 2.6 || r.w <= 0.) continue;
+    vec2 dd = wpx - r.xy; float dist = length(dd), front = 10. + age * 120.;
+    float w = exp(-pow((dist - front) / 18., 2.)) * (1. - age / 2.6) * r.w;
+    d += normalize(dd + .001) * sin((dist - front) * .38) * w * 9.; glint += w * max(0., sin((dist - front) * .38));
+  }
+  vec2 uv = (px + d) / res; uv.y = 1. - uv.y;
+  float ca = 1.4 / res.x;
+  vec3 col = vec3(texture(s, uv + vec2(ca, 0)).r, texture(s, uv).g, texture(s, uv - vec2(ca, 0)).b);
+  float c = caust(wpx * .011 + d * .02, t * .9) + caust(wpx * .007 - vec2(t * .02, 0), t * .6) * .6;
+  col += vec3(.55, .78, .82) * c * .018 + vec3(1., .25, .15) * c * .006 + vec3(.6, .8, .85) * glint * .22;
+  col *= .96 + .04 * sin(px.y * 3.14159 / dpr);
+  o = vec4(col, 1);
+}`);
+// frosted glass: whatever swims behind the letters (the koi, its beam) comes through blurred & a touch brighter
+const frostP = prog(QUAD_VS, `#version 300 es
+precision highp float; in vec2 v; out vec4 o; uniform sampler2D s, m; uniform vec2 px;
+void main() {
+  vec4 c = texture(s, v); float a = texture(m, vec2(v.x, 1. - v.y)).a;
+  if (a > .003) {
+    vec4 b = vec4(0); float ws = 0.;
+    for (int i = -3; i <= 3; i++) for (int j = -3; j <= 3; j++) { vec2 d = vec2(i, j); float w = exp(-dot(d, d) / 6.); b += texture(s, v + d * px * 4.) * w; ws += w; }
+    c = mix(c, b / ws + vec4(.035, .03, .03, 0), a);
+  }
+  o = c;
+}`);
+const quad = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, quad); gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
+const meshBuf = gl.createBuffer();
+function tex() { const t = gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D, t); for (const [k, v] of [[gl.TEXTURE_MIN_FILTER, gl.LINEAR], [gl.TEXTURE_MAG_FILTER, gl.LINEAR], [gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE], [gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE]]) gl.texParameteri(gl.TEXTURE_2D, k, v); return t; }
+gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, true);
+const layerTex = [tex(), tex(), tex(), tex(), tex(), tex()], sceneTex = tex(), fbo = gl.createFramebuffer(), sceneTex2 = tex(), fbo2 = gl.createFramebuffer();
+function upload(t, src) { gl.bindTexture(gl.TEXTURE_2D, t); gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, src); }
+
+function resize() {
+  DPR = Math.min(devicePixelRatio || 1, 1.5); W = innerWidth; H = innerHeight;
+  canvas.width = W * DPR; canvas.height = H * DPR;
+  for (const L of [A, B, C, D, E, M]) { L.c.width = W * DPR; L.c.height = H * DPR; L.g.setTransform(DPR, 0, 0, DPR, 0, 0); }
+  gl.bindTexture(gl.TEXTURE_2D, sceneTex); gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, W * DPR, H * DPR, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+  gl.bindFramebuffer(gl.FRAMEBUFFER, fbo); gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, sceneTex, 0);
+  gl.bindTexture(gl.TEXTURE_2D, sceneTex2); gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, W * DPR, H * DPR, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+  gl.bindFramebuffer(gl.FRAMEBUFFER, fbo2); gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, sceneTex2, 0);
+  letterX = [];
+}
+
+// ---------- panes: where each fish goes & what it aims at, in page coordinates (pane k spans k*H .. k*H+H) ----------
+let pane = 0, goal = null;   // goal: a clicked point the fleet swims to for a few seconds
+// Q 2026-11-01: no more orbiting ("I'm getting dizzy"). Each fish wanders (Reynolds-style steering): it picks a waypoint
+// in its zone for this section, swims there, glides on slowly for a beat, then picks the next one somewhere else.
+const wps = [];
+// the copy is a loose barrier (Reynolds' obstacle avoidance): no waypoints inside it, targets nudged out of it, & a fish
+// that sees it coming along its heading veers off. Rebuilt each frame from the current section's copy block.
+let barriers = [];
+const inB = (b, x, y, pad) => x > b.x0 - pad && x < b.x1 + pad && y > b.y0 - pad && y < b.y1 + pad;
+function updateBarriers() {
+  barriers = []; const c = copies[pane]; if (!c) return;
+  const r = c.getBoundingClientRect(); if (r.width) barriers.push({ x0: r.left, x1: r.right, y0: r.top + camY, y1: r.bottom + camY });
+  for (const P of photos) if (P.k === pane && P.file) barriers.push(P.file);
+}
+function wander(i, k, z, t) {
+  const f = fleet[i], L = f.len; let w = wps[i];
+  const pick = () => {
+    const far = Math.hypot(z.x1 - z.x0, z.y1 - z.y0) * .35; let c;
+    for (let n = 0; n < 14; n++) { c = { x: z.x0 + Math.random() * (z.x1 - z.x0), y: z.y0 + Math.random() * (z.y1 - z.y0) }; if (barriers.some(b => inB(b, c.x, c.y, L * .35))) continue; if (Math.hypot(c.x - f.x, c.y - f.y) > far) break; }
+    return wps[i] = { k, ...c, arrived: 0, dwell: 1.4 + Math.random() * 3.2 };
+  };
+  if (!w || w.k !== k) w = pick();
+  if (!w.arrived && Math.hypot(f.x - w.x, f.y - w.y) < L * .35) w.arrived = t;
+  if (w.arrived && t - w.arrived > w.dwell) w = pick();
+  return w.arrived ? { x: f.x + Math.cos(f.a) * L, y: f.y + Math.sin(f.a) * L, slow: true } : { x: w.x, y: w.y };
+}
+function plan(k, t, i) {
+  const y0 = k * H, P = paneRect(k), Z = (x0, x1, a, b) => ({ x0, x1, y0: y0 + H * a, y1: y0 + H * b });
+  let z;
+  if (i === 2) return wander(i, k, Z(W * .2, W * .8, .3, .8), t);   // the tuna: slow laps through the middle
+  if (k === 0) z = i === 0 ? Z(W * .1, W * .55, .14, .48) : Z(W * .5, W * .92, .3, .85);   // the hero: one fish a side
+  else if (P) {   // a photo: the koi works under it & just past its edges; the catfish holds the open side
+    const r = P, L = fleet[i].len;
+    z = i === 0 ? { x0: r.x - L * .1, x1: r.x + r.w + L * .1, y0: r.y + r.h * .1, y1: r.y + r.h * .95 } : P.side === 'l' ? Z(W * .62, W * .95, .12, .55) : Z(W * .05, W * .38, .12, .55);
+  } else if (dam && k === dam.k) {   // the dam: each fish holds station on the side of its target; when the two targets
+    // cross, the fish trade sides
+    const a = dam.lock(0), b = dam.lock(1), aim = i ? b : a;
+    if (a && b && t - (dam.swapAt || 0) > 4) { const want = a.x > b.x + 60 ? 1 : b.x > a.x + 60 ? 0 : dam.side || 0; if (want !== (dam.side || 0)) { dam.side = want; dam.swapAt = t; } }
+    const right = (i === 0) === !!dam.side;
+    return { x: right ? W * .8 : W * .24, y: y0 + H * (right ? .58 : .2), hold: true, aim, face: aim || { x: W * .5, y: y0 + H * .45 } };
+  } else z = i === 0 ? Z(W * .1, W * .55, .2, .75) : Z(W * .45, W * .9, .3, .85);   // the close
+  return wander(i, k, z, t);
+}
+
+// ---------- fish ----------
+const fishTex = [], fishImg = [];
+[1, 2, 3].forEach((n, i) => { const im = new Image(); im.onload = () => { fishImg[i] = im; fishTex[i] = tex(); upload(fishTex[i], im); }; im.src = `assets/fish-${n}.png`; });
+class Fish {
+  constructor(i, late) {
+    this.i = i; this.reset();
+    if (late) {   // deployed later (the tuna): swims up from below wherever the page is
+      this.entered = true; this.x = W * .5; this.y = camY + H + this.len * .6; this.a = -Math.PI / 2; this.speed = this.len * .3; this.trail = [];
+      for (let s = 0; s < 2000; s += 3) this.trail.push({ x: this.x, y: this.y + s });
+    }
+  }
+  get len() { return Math.min(H * .58, W * .42) * [1, 1.4, 2.1][this.i]; }   // SILURUS is big, the tuna (the tank) much bigger still
+  reset() {
+    // the koi drops in from the top, the catfish rises from the bottom
+    this.x = W * (this.i ? .6 : .4); this.y = this.i ? H + this.len * .7 : -this.len * .7; this.a = this.i ? -Math.PI / 2 - .2 : Math.PI / 2 - .2;
+    this.speed = 0; this.phase = this.i * 2; this.trail = []; this.entered = false; this.aim = null;
+    for (let s = 0; s < 2000; s += 3) this.trail.push({ x: this.x - Math.cos(this.a) * s, y: this.y - Math.sin(this.a) * s });
+  }
+  step(dt, t) {
+    const L = this.len;
+    if (!this.entered) {   // the entrance is on the clock, so it lands on cue whatever the frame rate
+      const u = ease((t - FISH_AT) / 2.5), x0 = W * (this.i ? .6 : .4), y0 = this.i ? H + L * .7 : -L * .7, x1 = W * (this.i ? .66 : .3), y1 = H * (this.i ? .56 : .44);
+      const nx = x0 + (x1 - x0) * u, ny = y0 + (y1 - y0) * u;
+      if (Math.hypot(nx - this.x, ny - this.y) > .01) this.a = Math.atan2(ny - this.y, nx - this.x);
+      this.x = nx; this.y = ny; this.phase += dt * 4; this.push();
+      if (u >= 1) { this.entered = true; this.speed = L * .2; } return;
+    }
+    const p = this.leaving ? { x: this.ex, y: this.ey } : goal ? { x: goal.x + (this.i ? 1 : -1) * L * .25, y: goal.y } : plan(pane, t, this.i);
+    this.aim = goal ? null : p.aim || null; this.ping = !goal && p.ping;
+    if (p.hold && !goal) {   // swim to the station, then hold it
+      if (!this.held && Math.hypot(this.x - p.x, this.y - p.y) < L * .4) { this.held = true; this.c = { x: this.x - Math.cos(this.a) * L * .5, y: this.y - Math.sin(this.a) * L * .5 }; }
+      if (this.held && Math.hypot(this.c.x - p.x, this.c.y - p.y) > L * .6) {   // the station moved (they swap sides): swim for it
+        this.held = false; this.w = 0; this.trail = []; for (let s = 0; s < 2000; s += 3) this.trail.push({ x: this.x - Math.cos(this.a) * s, y: this.y - Math.sin(this.a) * s });
+      }
+      if (this.held) return this.hold(dt, t, p);
+    } else if (this.held) {   // leaving the station: the body's trail picks up from where the straight body is
+      this.held = false; this.w = 0; this.trail = [];
+      for (let s = 0; s < 2000; s += 3) this.trail.push({ x: this.x - Math.cos(this.a) * s, y: this.y - Math.sin(this.a) * s });
+    }
+    let tx = p.x, ty = p.y; this.tx = tx; this.ty = ty;
+    for (const o of fleet) if (o !== this) {   // keep a body-width apart
+      const dx = this.x - o.x, dy = this.y - o.y, d = Math.hypot(dx, dy), min = (L + o.len) * (this.i === 2 || o.i === 2 ? .22 : .4);   // the tuna is too big to give everyone a full body-width
+      if (d < min && d > 0) { tx += dx / d * (min - d) * 2; ty += dy / d * (min - d) * 2; }
+    }
+    for (const b of barriers) {   // keep off the copy
+      const pad = L * .3;
+      if (inB(b, tx, ty, pad)) {
+        const e = [tx - (b.x0 - pad), (b.x1 + pad) - tx, ty - (b.y0 - pad), (b.y1 + pad) - ty], m = Math.min(...e);
+        if (m === e[0]) tx = b.x0 - pad; else if (m === e[1]) tx = b.x1 + pad; else if (m === e[2]) ty = b.y0 - pad; else ty = b.y1 + pad;
+      }
+      for (const k of [.35, .7, 1.05]) {
+        const ax = this.x + Math.cos(this.a) * L * k, ay = this.y + Math.sin(this.a) * L * k;
+        if (inB(b, ax, ay, pad * .5)) { const cx = (b.x0 + b.x1) / 2, cy = (b.y0 + b.y1) / 2, d = Math.hypot(ax - cx, ay - cy) || 1; tx = this.x + (ax - cx) / d * L * 1.3; ty = this.y + (ay - cy) / d * L * 1.3; break; }
+      }
+    }
+    const want = Math.atan2(ty - this.y, tx - this.x), dd = ((want - this.a + Math.PI * 3) % TAU) - Math.PI;
+    const dist = Math.hypot(tx - this.x, ty - this.y);
+    const rush = this.leaving ? 2 : goal ? 1.6 : 1;   // a waypoint: hurry & turn tighter; stood down: off at speed
+    const cruise = rush * (this.i === 2 ? (p.slow ? L * .05 : clamp(30 + dist * .3, L * .08, L * .18)) : p.slow ? L * .1 : clamp(40 + dist * .9, L * .16, L * 1.1));   // far: hurry; near: cruise; resting: glide. The tuna lumbers
+    this.speed += (cruise - this.speed) * Math.min(1, dt * 1.2);
+    const turn = clamp(this.speed / (L * .55), .25, 1.3) * (this.i === 2 ? 1.2 : 1) * (goal ? 1.9 : 1);   // wide, even turns: no tight curls
+    this.a += clamp(dd, -turn * dt, turn * dt);
+    this.x += Math.cos(this.a) * this.speed * dt; this.y += Math.sin(this.a) * this.speed * dt;
+    this.phase += dt * (2 + this.speed / L * 5);
+    this.push();
+  }
+  // holding station: pivot about the middle of the body toward the target, drift a hair, & every few seconds a few beats of
+  // the tail & fins to stay put. The body straightens out (w) so the whole fish turns, not just its head.
+  hold(dt, t, p) {
+    const L = this.len, want = Math.atan2(p.face.y - this.c.y, p.face.x - this.c.x), dd = ((want - this.a + Math.PI * 3) % TAU) - Math.PI;
+    this.a += clamp(dd * Math.min(1, dt * 1.6), -dt * .6, dt * .6);
+    this.c.x += (p.x - this.c.x) * dt * .3 + Math.sin(t * .5 + this.i * 2) * .12; this.c.y += (p.y - this.c.y) * dt * .3 + Math.cos(t * .4 + this.i) * .1;
+    this.x = this.c.x + Math.cos(this.a) * L * .5; this.y = this.c.y + Math.sin(this.a) * L * .5;
+    this.w = Math.min(1, (this.w || 0) + dt * 1.2);
+    const flick = (t + this.i * 1.7) % (3.1 + this.i * .9) < .75;
+    this.phase += dt * (flick ? 7 : .5); this.speed = flick ? L * .05 : 0;
+    this.push();
+  }
+  pt(s) {   // a point s along the body: the swum trail, blended toward a straight body while holding station
+    const q = this.at(s), w = this.w || 0; if (!w) return q;
+    return { x: q.x + (this.x - Math.cos(this.a) * s - q.x) * w, y: q.y + (this.y - Math.sin(this.a) * s - q.y) * w };
+  }
+  push() { const last = this.trail[0]; if (!last || Math.hypot(last.x - this.x, last.y - this.y) > 1.5) this.trail.unshift({ x: this.x, y: this.y }); if (this.trail.length > 1400) this.trail.length = 1400; }
+  at(s) {
+    let acc = 0, p = { x: this.x, y: this.y };
+    for (const q of this.trail) {
+      const seg = Math.hypot(q.x - p.x, q.y - p.y);
+      if (acc + seg >= s && seg > 0) { const u = (s - acc) / seg; return { x: p.x + (q.x - p.x) * u, y: p.y + (q.y - p.y) * u }; }
+      acc += seg; p = q;
+    }
+    return { x: p.x - Math.cos(this.a) * (s - acc), y: p.y - Math.sin(this.a) * (s - acc) };
+  }
+  spine(N) {
+    const L = this.len, pts = [];
+    for (let k = 0; k <= N; k++) {
+      const s = k / N * L, p = this.pt(s), pa = this.pt(Math.max(0, s - L * .09)), pb = this.pt(s + L * .09);
+      const a = Math.atan2(pa.y - pb.y, pa.x - pb.x), u = k / N;
+      const off = Math.sin(this.phase - u * 5) * L * .04 * Math.pow(u, 1.7);
+      const nx = -Math.sin(a), ny = Math.cos(a);
+      pts.push({ x: p.x + nx * off, y: p.y + ny * off, nx, ny, u, a });
+    }
+    return pts;
+  }
+  mesh() {
+    const img = fishImg[this.i], N = 80, sp = this.spine(N), w = img.width / img.height * this.len, v = new Float32Array((N + 1) * 8);
+    sp.forEach((p, k) => { const h = w / 2; v.set([p.x - p.nx * h, p.y - p.ny * h, 0, p.u, p.x + p.nx * h, p.y + p.ny * h, 1, p.u], k * 8); });
+    // laser source: the koi's eyes; the catfish's designator pod on its back (a third of the way down)
+    const src = sp[Math.round(N * (this.i ? .33 : .11))];
+    return { v, n: (N + 1) * 2, src, heading: sp[2].a, head: sp[Math.round(N * .06)] };
+  }
+}
+let fleet = [new Fish(0), new Fish(1)], leavers = [];   // leavers: units stood down, swimming off the screen
+function setUnits(n) {
+  n = clamp(n, 1, 3);
+  while (fleet.length < n) {   // a unit still on its way out turns around & rejoins; otherwise a fresh one deploys
+    const back = leavers.findIndex(f => f.i === fleet.length);
+    if (back < 0) fleet.push(new Fish(fleet.length, true)); else { const f = leavers.splice(back, 1)[0]; f.leaving = false; fleet.push(f); }
+  }
+  while (fleet.length > n) {   // stood down: head out the nearest way, away from the middle of the screen
+    const f = fleet.pop(), dx = f.x - W / 2, dy = f.y - camY - H / 2, d = Math.hypot(dx, dy) || 1, far = Math.hypot(W, H) + f.len * 2;
+    f.leaving = clock(); f.ex = f.x + dx / d * far; f.ey = f.y + dy / d * far; leavers.push(f);
+  } document.getElementById('count').textContent = `${n} unit${n > 1 ? 's' : ''} deployed`;
+  document.getElementById('more').classList.toggle('maxed', n >= 3); document.getElementById('less').classList.toggle('maxed', n <= 1); }   // three is the cap: koi, catfish, tuna
+document.getElementById('more').onclick = () => {
+  if (fleet.length >= 3) return say('Procurement', 'Three units. Program of record.', 'Additional fish require congressional approval & a larger pond.');
+  setUnits(fleet.length + 1); if (fleet.length === 3) flashTraffic();
+};
+let flashTimer;
+function flashTraffic() {   // the tuna is a tank: it gets an urgent banner & a klaxon
+  const el = document.getElementById('flash'), d = new Date();
+  document.getElementById('flashT').textContent = d.toISOString().slice(11, 19) + 'Z';
+  el.classList.remove('on'); void el.offsetWidth; el.classList.add('on');
+  clearTimeout(flashTimer); flashTimer = setTimeout(() => el.classList.remove('on'), 4800);
+  try {
+    actx = actx || new (window.AudioContext || window.webkitAudioContext)(); if (actx.state === 'suspended') actx.resume();
+    const t = actx.currentTime, o = actx.createOscillator(), g = actx.createGain();
+    o.type = 'square'; for (let k = 0; k < 6; k++) o.frequency.setValueAtTime(k % 2 ? 620 : 880, t + k * .25);
+    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(.05, t + .02); g.gain.setValueAtTime(.05, t + 1.4); g.gain.linearRampToValueAtTime(0, t + 1.5);
+    o.connect(g); g.connect(actx.destination); o.start(t); o.stop(t + 1.55);
+  } catch (e) {}
+}
+document.getElementById('less').onclick = () => setUnits(fleet.length - 1);
+
+function drawFish(f) {
+  if (!fishTex[f.i]) return null;
+  const m = f.mesh(), L = f.len;
+  if (m.head.y - camY < -L || m.head.y - camY > H + L * 1.2) return m;   // off screen: skip the draw, keep the data
+  gl.useProgram(meshP.p); gl.uniform2f(meshP.u.res, W, H);
+  gl.bindBuffer(gl.ARRAY_BUFFER, meshBuf); gl.bufferData(gl.ARRAY_BUFFER, m.v, gl.DYNAMIC_DRAW);
+  const P = gl.getAttribLocation(meshP.p, 'p'), U = gl.getAttribLocation(meshP.p, 'uv');
+  gl.enableVertexAttribArray(P); gl.vertexAttribPointer(P, 2, gl.FLOAT, false, 16, 0);
+  gl.enableVertexAttribArray(U); gl.vertexAttribPointer(U, 2, gl.FLOAT, false, 16, 8);
+  gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, fishTex[f.i]); gl.uniform1i(meshP.u.s, 0);
+  gl.uniform1f(meshP.u.shade, 1);
+  for (const [dx, dy] of [[0, 0], [6, 5], [-5, 7], [4, -4], [10, 12]]) { gl.uniform2f(meshP.u.off, L * .05 + dx, L * .08 + dy - camY); gl.uniform1f(meshP.u.a, .13); gl.drawArrays(gl.TRIANGLE_STRIP, 0, m.n); }
+  gl.uniform1f(meshP.u.shade, 0); gl.uniform2f(meshP.u.off, 0, -camY); gl.uniform1f(meshP.u.a, 1);
+  gl.drawArrays(gl.TRIANGLE_STRIP, 0, m.n);
+  return m;
+}
+function drawLayer(i, src) {
+  upload(layerTex[i], src);
+  gl.useProgram(layerP.p); gl.bindBuffer(gl.ARRAY_BUFFER, quad);
+  const q = gl.getAttribLocation(layerP.p, 'q'); gl.enableVertexAttribArray(q); gl.vertexAttribPointer(q, 2, gl.FLOAT, false, 0, 0);
+  gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, layerTex[i]); gl.uniform1i(layerP.u.s, 0); gl.uniform1f(layerP.u.a, 1);
+  gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+}
+
+// ---------- ripples (page coordinates): the pointer stirs the water; a click sends the fleet ----------
+const rip = new Float32Array(40); let ripN = 0, lastRip = 0;
+function ripple(x, y, t, amp) { rip.set([x, y, t, amp], (ripN++ % 10) * 4); }
+const wake = new Float32Array(64); let wakeN = 0;
+function wakes(t) {   // each beat of a tail leaves a little ring at the tail fin; harder swimming, stronger rings
+  for (const f of [...fleet, ...leavers]) {
+    const beat = Math.floor(f.phase / Math.PI); if (beat === f.beat) continue; f.beat = beat;
+    const q = f.pt(f.len * .93), y = q.y - camY; if (q.x < 0 || q.x > W || y < 0 || y > H || f.speed < f.len * .02) continue;
+    wake.set([q.x, q.y, t, clamp(f.speed / (f.len * .4), .35, 1) * (f.i === 2 ? 1.3 : 1)], (wakeN++ % 16) * 4);
+  }
+}
+addEventListener('pointermove', e => { const t = clock(); if (t - lastRip > .12) { ripple(e.clientX, e.clientY + camY, t, .28); lastRip = t; } });
+addEventListener('pointerdown', e => {
+  if (e.target.closest('button, a, dialog, .mark')) return;
+  const egg = eggAt(e.clientX, e.clientY); if (egg) { window.open(egg, '_blank', 'noopener'); return; }   // the Mordire file
+  if (choosePhoto(photoAt(e.clientX, e.clientY))) return;   // a click on the photo behind swaps the pair, not the fleet
+  const front = frontAt(e.clientX, e.clientY); if (front) return openPhoto(front);   // the photo up front opens full screen
+  const hitFish = fleet.find(f => f.spine(16).some(q => Math.hypot(q.x - e.clientX, q.y - (e.clientY + camY)) < f.len * .12));
+  if (hitFish) { hitFish.tagUntil = clock() + 5; return; }   // a click on a fish shows its tag for a few seconds
+  const t = clock(); ripple(e.clientX, e.clientY + camY, t, 1);
+  goal = { x: e.clientX, y: e.clientY + camY, until: t + 8 };   // held until the fleet arrives (or 8 s)
+  pings.push({ x: e.clientX, y: e.clientY + camY, t }); pingSound();
+});
+
+// ---------- the intro choreography ----------
+const T0 = performance.now(); const clock = () => (performance.now() - T0) / 1000;
+const WORD_Y = .36, WORD = 'CARP.', SUB = 'COVERT AQUATIC RECONNAISSANCE PLATFORMS';
+const LETTER_AT = [1.3, 1.55, 1.8, 2.05, 2.4], SUB_AT = 2.5, FISH_AT = 2.7, LASER_AT = 4.2, HEAD_AT = 4.5, REST_AT = 5.6;
+const landed = LETTER_AT.map(() => false);
+let wordFont = 0, letterX = [];
+// the word sits between the nav & the hero copy whatever the screen's shape (16:9 pushed it into the nav)
+let wordCY = 0, capH = 0;
+function layoutWord() {
+  const g = B.g, copy = document.querySelector('#p0 .copy'), top = 112, bottom = Math.max(top + 160, copy.offsetTop - 26);
+  g.font = "900 100px 'Big Shoulders Stencil Display'"; const r = g.measureText('CARP').actualBoundingBoxAscent / 100 || .72;
+  wordFont = Math.min(W * .29, (bottom - top - 30) / r); capH = wordFont * r; wordCY = top + 30 + (bottom - top - 30) / 2;
+  g.font = `900 ${wordFont}px 'Big Shoulders Stencil Display'`;
+  const widths = [...WORD].map(ch => g.measureText(ch).width), gap = wordFont * .02, total = widths.reduce((a, b) => a + b, 0) + gap * (WORD.length - 1);
+  let x = W / 2 - total / 2; letterX = widths.map(w => { const c = x + w / 2; x += w + gap; return c; });
+  letterX[4] -= wordFont * .09;   // the period tucks in under the P's bowl
+}
+function drawWord(t) {
+  const g = B.g, m = M.g; g.clearRect(0, 0, W, H); m.clearRect(0, 0, W, H);
+  const cy = wordCY - camY; if (cy < -wordFont) return;
+  m.font = `900 ${wordFont}px 'Big Shoulders Stencil Display'`; m.textAlign = 'center'; m.textBaseline = 'alphabetic';
+  if (!letterX.length) layoutWord();
+  g.font = `900 ${wordFont}px 'Big Shoulders Stencil Display'`; g.textAlign = 'center'; g.textBaseline = 'alphabetic';
+  [...WORD].forEach((ch, k) => {
+    const u = still ? 1 : ease((t - LETTER_AT[k]) / .55); if (u <= 0) return;
+    if (!landed[k] && u > .55) { landed[k] = true; ripple(letterX[k], wordCY, t, k === 4 ? 1.4 : 1.1); }
+    const s = 1 + (1 - u) * .6, glitch = (1 - u) * 30 + (Math.random() < .02 ? 6 : 0), dot = ch === '.';
+    g.save(); g.translate(letterX[k], cy - (1 - u) * 40); g.scale(s, s); g.translate(0, capH / 2); g.globalAlpha = u;
+    // each letter lands bright, then the fill sinks to glass (Q 2026-11-01): the fish behind it read through, blurred
+    // (the frost pass uses M), & a bright red outline holds the shape
+    const sink = still ? .93 : ease((t - LETTER_AT[k] - 1.4) / 1.6) * .93;
+    m.save(); m.translate(letterX[k], cy - (1 - u) * 40); m.scale(s, s); m.translate(0, capH / 2); m.fillStyle = `rgba(255,255,255,${u})`; m.fillText(ch, 0, 0); m.restore();
+    g.fillStyle = `rgba(255,42,31,${.55 * (1 - sink * .7)})`; g.fillText(ch, -6 - glitch, 0);
+    g.fillStyle = `rgba(0,200,255,${.22 * (1 - sink * .7)})`; g.fillText(ch, 6 + glitch, 0);
+    g.shadowColor = 'rgba(255,42,31,.4)'; g.shadowBlur = 60 * (1 - sink); g.fillStyle = dot ? `rgba(255,42,31,${1 - sink})` : `rgba(237,235,228,${1 - sink})`; g.fillText(ch, 0, 0);
+    g.shadowBlur = 0; g.strokeStyle = '#FF2A1F'; g.lineWidth = Math.max(1.5, wordFont * .005) / s; g.globalAlpha = u * sink / .93 * .5; g.strokeText(ch, 0, 0);   // the outline at half strength
+    g.restore();
+  });
+  const n = still ? SUB.length : Math.floor(clamp((t - SUB_AT) / 1.1) * SUB.length);
+  if (n) { g.font = `500 11px 'JetBrains Mono'`; g.fillStyle = '#FF2A1F'; g.textAlign = 'center';
+    g.fillText(SUB.slice(0, n).split('').join('  '), W / 2, cy - capH / 2 - 20); }
+}
+// ---------- backdrop: a quiet scrolling grid; the sonar on the hero & again on the close ----------
+function radar(g, t, cx, cy, a) {
+  if (a <= .01) return;
+  const R = Math.hypot(W, H) / 2;
+  g.save(); g.globalAlpha = a;
+  g.strokeStyle = 'rgba(255,42,31,.16)'; g.lineWidth = 1;
+  for (let r = 90; r < R; r += 90) { g.beginPath(); g.arc(cx, cy, r, 0, TAU); g.stroke(); }
+  g.fillStyle = 'rgba(255,42,31,.4)'; g.font = '500 10px JetBrains Mono';
+  for (let k = 0; k < 36; k++) { const an = k / 36 * TAU, r0 = Math.min(W, H) * .47; g.save(); g.translate(cx + Math.cos(an) * r0, cy + Math.sin(an) * r0); g.rotate(an + Math.PI / 2); g.fillRect(-.5, 0, 1, k % 3 ? 6 : 12); if (k % 3 === 0) g.fillText(String(k * 10).padStart(3, '0'), -9, 24); g.restore(); }
+  const sw = (t * .7) % TAU, cone = g.createConicGradient(sw - .9, cx, cy);
+  cone.addColorStop(0, 'rgba(255,42,31,0)'); cone.addColorStop(.14, 'rgba(255,42,31,.2)'); cone.addColorStop(.143, 'rgba(255,42,31,0)');
+  g.fillStyle = cone; g.fillRect(0, 0, W, H);
+  g.strokeStyle = 'rgba(255,60,40,.55)'; g.beginPath(); g.moveTo(cx, cy); g.lineTo(cx + Math.cos(sw) * R, cy + Math.sin(sw) * R); g.stroke();
+  for (const f of fleet) {
+    const c = f.pt(f.len * .45), fx = c.x, fy = c.y - camY;   // the contact is the body, not the tip of the nose
+    const an = (Math.atan2(fy - cy, fx - cx) + TAU) % TAU, since = ((sw - an) % TAU + TAU) % TAU, b = Math.max(0, 1 - since / 2.2);
+    if (b > 0 && fy > 0 && fy < H) { g.fillStyle = `rgba(255,42,31,${b * .8})`; g.shadowColor = 'rgba(255,42,31,.9)'; g.shadowBlur = 18; g.beginPath(); g.arc(fx, fy, 6 + b * 6, 0, TAU); g.fill(); g.shadowBlur = 0; }
+  }
+  g.restore();
+}
+function drawBackdrop(t) {
+  const g = A.g, up = still ? 1 : ease((t - .5) / 1.2);
+  g.fillStyle = '#050505'; g.fillRect(0, 0, W, H);
+  const glow = g.createRadialGradient(W / 2, H * .46, 0, W / 2, H * .46, Math.hypot(W, H) / 2); glow.addColorStop(0, `rgba(40,16,12,${.9 * up})`); glow.addColorStop(1, 'rgba(5,5,5,0)'); g.fillStyle = glow; g.fillRect(0, 0, W, H);
+  g.save(); g.globalAlpha = up; g.strokeStyle = 'rgba(237,235,228,.04)'; g.lineWidth = 1;
+  for (let x = (W / 2) % 48; x < W; x += 48) { g.beginPath(); g.moveTo(x, 0); g.lineTo(x, H); g.stroke(); }
+  for (let y = ((H * .46 - camY) % 48 + 48) % 48; y < H; y += 48) { g.beginPath(); g.moveTo(0, y); g.lineTo(W, y); g.stroke(); }
+  g.restore();
+  radar(g, t, W / 2, H * .46 - camY, up * clamp(1 - camY / (H * .8)));
+  if (dam) dam.draw(g, .34);
+  const end = (panes.length - 1) * H; radar(g, t, W / 2, end + H * .46 - camY, clamp(1 - Math.abs(camY - end) / (H * .8)));
+}
+// a fish's laser: from its source straight ahead (sweeping a little), or locked onto the pane's target
+function laser(g, t, f, m, k) {
+  const on = still ? 1 : ease((t - LASER_AT) / .6); if (!m || on <= 0) return;
+  const L = f.len, sx = m.src.x, sy = m.src.y - camY;
+  let x2, y2, hit = false;
+  if (f.aim) { x2 = f.aim.x; y2 = f.aim.y - camY; hit = true; }
+  else { const a = m.heading + Math.sin(t * .9 + k * 2) * .18, reach = L * (1 + .25 * Math.sin(t * .7 + k)) * on; x2 = sx + Math.cos(a) * reach; y2 = sy + Math.sin(a) * reach; }
+  const beam = g.createLinearGradient(sx, sy, x2, y2); beam.addColorStop(0, 'rgba(255,60,40,.95)'); beam.addColorStop(1, hit ? 'rgba(255,60,40,.9)' : 'rgba(255,42,31,0)');
+  g.save(); g.strokeStyle = beam; g.lineCap = 'round';
+  g.shadowColor = 'rgba(255,42,31,1)'; g.shadowBlur = 22; g.lineWidth = 7; g.globalAlpha = .35; g.beginPath(); g.moveTo(sx, sy); g.lineTo(x2, y2); g.stroke();
+  g.shadowBlur = 8; g.lineWidth = 1.6; g.globalAlpha = 1; g.stroke();
+  g.fillStyle = 'rgba(255,90,70,1)'; g.shadowBlur = 24; g.beginPath(); g.arc(sx, sy, 3.5 + Math.sin(t * 9) * .8, 0, TAU); g.fill();
+  if (hit) { g.beginPath(); g.arc(x2, y2, 4 + Math.sin(t * 14) * 1.5, 0, TAU); g.fill(); }
+  g.restore();
+}
+function tag(g, t, f, m, k) {
+  if (!m || !f.tagUntil || t > f.tagUntil) return;
+  const left = f.tagUntil - t, a = clamp((5 - left) / .2) * (left < .8 ? (Math.floor(t * 16) % 2 ? 1 : .15) : 1);
+  const h = { x: m.head.x, y: m.head.y - camY }, s = f.len * .13;
+  g.save(); g.globalAlpha = a; g.strokeStyle = 'rgba(255,184,0,.85)'; g.lineWidth = 1.4;
+  for (const [dx, dy] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) { g.beginPath(); g.moveTo(h.x + dx * s, h.y + dy * s * .55); g.lineTo(h.x + dx * s, h.y + dy * s); g.lineTo(h.x + dx * s * .55, h.y + dy * s); g.stroke(); }
+  g.font = '700 10px JetBrains Mono'; g.fillStyle = 'rgba(255,184,0,.95)';
+  const state = goal ? 'EN ROUTE' : f.aim ? 'DESIGNATING' : f.ping ? 'LISTENING' : 'PATROL';
+  g.fillText(`${['KOI-01', 'SILURUS-02', 'TUNA-03 // TANK'][k]} // ${state}`, h.x + s + 8, h.y - s + 10);
+  g.fillStyle = 'rgba(237,235,228,.55)'; g.fillText(`HDG ${String(Math.round(((f.a * 180 / Math.PI) + 450) % 360)).padStart(3, '0')}  SPD ${(f.speed / 40).toFixed(1)} KN`, h.x + s + 8, h.y - s + 24);
+  g.restore();
+}
+// ---------- DOM: letter-by-letter headings, pane reveals, the pager, nav ----------
+for (const el of document.querySelectorAll('.chars')) {
+  // letters animate one by one; each word stays one unbreakable unit so lines only wrap between words
+  let i = 0; const wrap = n => { for (const c of [...n.childNodes]) { if (c.nodeType === 3) { const f = document.createDocumentFragment();
+    c.textContent.split(/( )/).forEach(tok => { if (tok === ' ') { f.append(' '); return; } if (!tok) return; const w = document.createElement('span'); w.style.cssText = 'display:inline-block;white-space:nowrap';
+      for (const ch of tok) { const s = document.createElement('span'); s.className = 'c'; s.style.setProperty('--i', i++); s.textContent = ch; w.appendChild(s); } f.appendChild(w); });
+    c.replaceWith(f); } else wrap(c); } }; wrap(el);
+}
+const main = document.querySelector('main'), panes = [...document.querySelectorAll('.pane')], copies = panes.map(p => p.querySelector('.copy')), dots = [...document.querySelectorAll('#pager i')], links = [...document.querySelectorAll('nav .links a')];
+
+// ---------- field photos: the people on their own plane, the scene sketched in behind them, parallax on the pointer ----------
+// Built from the approaches that hold up (Q 2026-11-01: research first): BiRefNet cutouts (via rembg), LaMa (IOPaint)
+// to fill the background behind the people, Sobel pencil lines (the Codrops sketchy-pencil pass) & a canvas brush mask
+// driving the sketch-to-photo mix in the shader. Layers: assets/photos/<name>-bg.jpg & <name>-fg.webp; sources in
+// assets/originals/photos. The photos sit over the fish: they swim underneath.
+const photoP = prog(`#version 300 es
+in vec2 q; out vec2 uv; uniform vec4 rect; uniform vec2 res;
+void main() { uv = vec2(q.x * .5 + .5, .5 - q.y * .5); vec2 c = (rect.xy + uv * rect.zw) / res * 2. - 1.; gl_Position = vec4(c.x, -c.y, 0, 1); }`, `#version 300 es
+precision highp float; in vec2 uv; out vec4 o;
+uniform sampler2D bg, fg, mk; uniform vec2 par, texel; uniform float fgA, lift, fade, dim;
+float lum(vec2 p) { return dot(texture(bg, p).rgb, vec3(.3, .59, .11)); }
+void main() {
+  vec2 b = (uv - .5) / 1.07 + .5 - par * .012, f = (uv - .5) / 1.025 + .5 + par * .016 + vec2(0, lift);
+  vec4 m = texture(mk, uv);
+  float gx = lum(b + vec2(texel.x, 0)) - lum(b - vec2(texel.x, 0)), gy = lum(b + vec2(0, texel.y)) - lum(b - vec2(0, texel.y));
+  vec3 sketch = mix(vec3(.04, .035, .035), vec3(.93, .9, .84), smoothstep(.05, .16, length(vec2(gx, gy))));
+  vec4 c = vec4(texture(bg, b).rgb, 1) * m.g, l = vec4(sketch, 1) * m.r * .94;
+  c += l * (1. - c.a);
+  vec4 p = (f.x < 0. || f.x > 1. || f.y < 0. || f.y > 1.) ? vec4(0) : texture(fg, f) * fgA;
+  o = (p + c * (1. - p.a)) * fade; o.rgb *= dim;
+}`);
+const photos = panes.flatMap((el, k) => {
+  if (!el.dataset.photo) return [];
+  const names = el.dataset.photo.split(','), caps = el.dataset.cap.toUpperCase().split('|'), depth = (el.dataset.depth || '1').split(',').map(Number);
+  return names.map((name, j) => {
+    const P = { k, j, slot: j, slotTo: j, count: names.length, pair: names.length > 1, side: el.dataset.side, cap: caps[j], depth: depth[j] ?? 1, d: depth[j] ?? 1, z: j ? 0 : 1,
+      target: j === 0 && el.dataset.target && el.dataset.target.split(',').map(Number), intel: j === 0 && el.dataset.intel && el.dataset.intel.toUpperCase().split('|'), egg: j === 0 && el.dataset.egg,
+      drawn: '', bg: tex(), fg: tex(), mk: tex(), m: layer(), n: 0, aspect: 1.5, iw: 1536 };
+    for (const [key, ext] of [['bg', 'jpg'], ['fg', 'webp']]) {
+      const im = new Image(); im.onload = () => { upload(P[key], im); P[key + 'Im'] = im; if (key === 'bg') { P.aspect = im.width / im.height; P.iw = im.width; scribble(P); } P.n++; };
+      im.src = `assets/photos/${name}-${key}.${ext}`;
+    }
+    return P;
+  });
+});
+// page coordinates. One photo: a big frame on its side. Two: the first high on the outside, the second low on the inside,
+// overlapping. Frames on the right start lower so they never sit under the telemetry.
+function photoRect(P) {
+  // 12 columns inside the grid margin; everything centers on one line between the nav & the CTA, so the copy & the photos
+  // balance each other. One photo: 6.4 columns. A pair: stacked, the selected one in front (6 columns, on the margin), the
+  // other behind it peeking up & in toward the copy. P.slot glides 0 (front) <-> 1 (behind) when the arrows swap them.
+  const small = W < 760, M = Math.max(40, W * .05), c = (W - 2 * M) / 12, bandT = 116, bandB = H - 140, mid = (bandT + bandB) / 2;
+  let w, x, y;
+  if (small) { w = W - 48; x = 24; y = 104; }
+  else if (!P.pair) {
+    const top = P.target ? bandT + 104 : P.side === 'r' ? 150 : bandT;   // a callout's file needs room above the photo
+    w = Math.min(c * 6.4, (bandB - top) * .9 * P.aspect); const h = w / P.aspect;
+    x = P.side === 'l' ? M : W - M - w; y = Math.max(top, (top + bandB) / 2 - h / 2);
+  } else {
+    const n = P.count - 1, lift = n > 1 ? 40 : 56, step = n > 1 ? .8 : 1.1, F = { w: Math.min(c * 6, (bandB - bandT - lift * n) * .86 * P.aspect) }; F.h = F.w / P.aspect;
+    F.x = P.side === 'l' ? M : W - M - F.w; F.y = Math.max(150 + lift * n, mid - (F.h + lift * n) / 2 + lift * n);
+    const u = P.slot; w = F.w * (1 - .16 * u);   // each step back: a little smaller, up a little & in toward the copy
+    x = P.side === 'l' ? F.x + F.w - w + c * step * u : F.x - c * step * u; y = F.y - lift * u;
+  }
+  const h = w / P.aspect, sc = .9 + .1 * P.d;   // a photo pushed back under the water shrinks a little about its center
+  const drift = (P.k * H - camY) * (.08 + .05 * P.slot);   // scroll parallax: each photo trails the page a little
+  return { x: x + w * (1 - sc) / 2, y: P.k * H + y + h * (1 - sc) / 2 + drift + (P.oy || 0), w: w * sc, h: h * sc };   // oy: the lift during a swap
+}
+function paneRect(k) {   // everything the photos in a section cover
+  const rs = photos.filter(P => P.k === k).map(photoRect); if (!rs.length) return null;
+  const x0 = Math.min(...rs.map(r => r.x)), y0 = Math.min(...rs.map(r => r.y)), x1 = Math.max(...rs.map(r => r.x + r.w)), y1 = Math.max(...rs.map(r => r.y + r.h));
+  return { x: x0, y: y0, w: x1 - x0, h: y1 - y0, side: photos.find(P => P.k === k).side };
+}
+// choosing: click the small photo of a pair & the two trade places (the chosen one up front & above the water)
+function eggAt(x, y) {   // his face or his typed file, while the callout is up
+  const P = photos.find(P => P.egg && P.k === pane && P.iv > 2); if (!P) return null;
+  const inR = (b, py) => b && x > b.x0 && x < b.x1 && py > b.y0 && py < b.y1;
+  return inR(P.face, y) || inR(P.file, y + camY) ? P.egg : null;
+}
+function photoAt(x, y) {
+  const py = y + camY;
+  return photos.filter(P => P.pair && P.k === pane && photoState(P).p > .3 && (r => x > r.x && x < r.x + r.w && py > r.y && py < r.y + r.h)(photoRect(P)))
+    .sort((a, b) => a.slotTo - b.slotTo)[0];
+}
+// photos never pass through each other. One photo changes places with the rest of the stack: the old front going to the
+// back drops down & under, or the old back coming to the front rises up & over; the others move the opposite way. They
+// trade order only at the top of the arc, when the separation (worked out from the photos' midway spots) has them clear.
+const SWAP_S = 1.1;
+function choosePhoto(top) {   // the chosen photo comes to the front; the stack keeps its order around it
+  if (!top || top.slotTo === 0) return false;
+  const st = photos.filter(P => P.k === top.k); if (st.some(P => P.sw)) return true;   // one swap at a time
+  const swaps = st.some(P => P.under), shift = top.slotTo, n = top.count, t0 = clock();
+  nextSwap = t0 + 10;
+  for (const P of st) { P.from = P.slotTo; P.slotTo = (P.slotTo - shift + n) % n; P.z = P.slotTo ? 0 : 1; if (swaps) P.depthTo = P.slotTo ? 0 : 1; }
+  const oldFront = st.find(P => P.from === 0), down = oldFront.slotTo === n - 1, mover = down ? oldFront : st.find(P => P.slotTo === 0);
+  const mid = P => { const s0 = P.slot, o0 = P.oy; P.slot = (P.from + P.slotTo) / 2; P.oy = 0; const r = photoRect(P); P.slot = s0; P.oy = o0; return r; };
+  const m = mid(mover); let gap = 0;
+  for (const P of st) if (P !== mover) { const r = mid(P); gap = Math.max(gap, down ? r.y + r.h - m.y : m.y + m.h - r.y); }
+  gap += 28;   // a little daylight between them
+  for (const P of st) { P.sw = true; P.t0 = t0; P.amt = (P === mover ? .6 : -.4) * gap * (down ? 1 : -1); }
+  return true;
+}
+function cycle(dir) {   // → brings the next photo forward, ← the last one
+  const st = photos.filter(P => P.pair && P.k === pane); if (!st.length) return;
+  const want = dir > 0 ? 1 : st[0].count - 1; choosePhoto(st.find(P => P.slotTo === want));
+}
+const swapPair = () => cycle(1);
+document.getElementById('swapPrev').onclick = () => cycle(-1); document.getElementById('swapNext').onclick = () => cycle(1);
+const swapEl = document.getElementById('swap'), swapN = document.getElementById('swapN');
+// sit in a two-photo section for 5 s & the photos swap on their own, then every 10 s after; a manual swap restarts the 10 s
+let dwellK = -1, nextSwap = 0;
+function autoSwap(t) {
+  const settled = !tween && !going && Math.abs(camY - pane * H) < 8 && reveal[pane] >= 1 && photos.some(P => P.pair && P.k === pane);
+  if (!settled) { dwellK = -1; return; }
+  if (dwellK !== pane) { dwellK = pane; nextSwap = t + 5; }
+  if (t >= nextSwap) { swapPair(); nextSwap = t + 10; }
+}
+function placeSwap() {
+  const front = photos.find(P => P.pair && P.k === pane && P.slotTo === 0);
+  if (!front || photoState(front).p < .5) { swapEl.classList.remove('on'); return; }
+  const s0 = front.slot, d0 = front.d, o0 = front.oy; front.slot = 0; front.d = 1; front.oy = 0; const r = photoRect(front); front.slot = s0; front.d = d0; front.oy = o0;   // the front spot, not the photo mid-glide
+  const b = swapEl.getBoundingClientRect();
+  swapEl.style.left = (r.x + r.w - b.width) + 'px'; swapEl.style.top = (r.y - camY + r.h + 12) + 'px';
+  swapN.textContent = `${front.j + 1} / ${front.count}`; swapEl.classList.add('on');
+}
+addEventListener('pointermove', e => { document.body.style.cursor = eggAt(e.clientX, e.clientY) || (p => p && p.slotTo > 0)(photoAt(e.clientX, e.clientY)) ? 'pointer' : frontAt(e.clientX, e.clientY) ? 'zoom-in' : ''; });
+// the lightbox: the front photo (or a section's only photo), once it's drawn in, opens full screen: background & cutout
+// composed onto one canvas from the images already loaded
+function frontAt(x, y) {
+  const py = y + camY;
+  return photos.find(P => P.k === pane && (!P.pair || P.slotTo === 0) && !P.sw && P.bgIm && photoState(P).p > .5 && (r => x > r.x && x < r.x + r.w && py > r.y && py < r.y + r.h)(photoRect(P)));
+}
+const lb = document.getElementById('lb'), lbC = document.getElementById('lbC');
+function openPhoto(P) {
+  const w = P.bgIm.naturalWidth, h = P.bgIm.naturalHeight, g = lbC.getContext('2d'); lbC.width = w; lbC.height = h;
+  g.drawImage(P.bgIm, 0, 0, w, h); if (P.fgIm) g.drawImage(P.fgIm, 0, 0, w, h);
+  document.getElementById('lbCap').textContent = P.cap; lb.showModal(); document.body.style.cursor = '';
+}
+lb.addEventListener('click', () => lb.close());
+for (const P of photos) { P.under = P.depth === 0 || photos.some(o => o.k === P.k && o.depth === 0); P.depthTo = P.depth; }
+// the brush: one long scribble sweeping across the frame, hatching back & forth like a marker filling it in
+function scribble(P) {
+  const MW = 360, MH = Math.round(MW / P.aspect), pts = [], slant = MH * .45;
+  let seed = P.k * 7919 + 1; const rnd = () => (seed = seed * 16807 % 2147483647) / 2147483647;
+  for (let x = -slant - 20, up = 0; x < MW + 30; x += 15 + rnd() * 8, up ^= 1) pts.push([x + (up ? slant : 0) + (rnd() - .5) * 14, up ? -14 + rnd() * 10 : MH + 14 - rnd() * 10]);
+  if (P.side === 'r') for (const p of pts) p[0] = MW - p[0];
+  let acc = 0; P.len = pts.map((p, i) => acc += i ? Math.hypot(p[0] - pts[i - 1][0], p[1] - pts[i - 1][1]) : 0);
+  P.pts = pts; P.m.c.width = MW; P.m.c.height = MH;
+}
+function brush(g, P, u, w, col) {
+  if (u <= 0) return; if (u >= .9995) { g.fillStyle = col; g.fillRect(0, 0, P.m.c.width, P.m.c.height); return; }
+  const L = P.len[P.len.length - 1] * u; g.strokeStyle = col; g.lineWidth = w; g.lineCap = g.lineJoin = 'round'; g.beginPath();
+  for (let i = 0; i < P.pts.length; i++) {
+    const [x, y] = P.pts[i];
+    if (P.len[i] <= L) { i ? g.lineTo(x, y) : g.moveTo(x, y); continue; }
+    const [px, py] = P.pts[i - 1], f = (L - P.len[i - 1]) / (P.len[i] - P.len[i - 1]); g.lineTo(px + (x - px) * f, py + (y - py) * f); break;
+  }
+  g.stroke();
+}
+const smooth = u => u * u * (3 - 2 * u);
+function photoState(P) {   // by scroll: the people first, then the pencil lines, the color, the caption & any target
+  const p = still ? 1 : P.j ? clamp((reveal[P.k] - .14) / .86) : reveal[P.k];   // a second photo follows the first
+  return { p, people: ease(p / .12), lines: smooth(clamp((p - .08) / .26)), fill: smooth(clamp((p - .26) / .28)), cap: clamp((p - .42) / .18), intel: (p - .58) / .36 * 4.2 };
+}
+const par = { x: 0, y: 0, tx: 0, ty: 0 };
+addEventListener('pointermove', e => { par.tx = e.clientX / W * 2 - 1; par.ty = e.clientY / H * 2 - 1; });
+function drawPhotos(t, dt, over) {   // over: above the water (after the water pass); otherwise under it, beneath the fish
+  if (over) { par.x += (par.tx - par.x) * Math.min(1, dt * 3); par.y += (par.ty - par.y) * Math.min(1, dt * 3); for (const P of photos) {
+    if (P.sw) {   // the swap arc: slide between spots, lifted apart in the middle
+      const u = clamp((clock() - P.t0) / SWAP_S);
+      P.slot = P.from + (P.slotTo - P.from) * smooth(u); P.oy = Math.sin(Math.PI * u) * P.amt;
+      if (u >= .35) P.depth = P.depthTo;   // in or out of the water while they're apart
+      if (u >= 1) { P.sw = false; P.oy = 0; P.slot = P.slotTo; }
+    } else P.slot += (P.slotTo - P.slot) * Math.min(1, dt * 4.5);
+    P.d += (P.depth - P.d) * Math.min(1, dt * 5);
+  } }
+  // draw order: the stack order, which a swap only changes at the top of its arc (once the photos are clear of each other)
+  const zOf = P => -(P.sw && clock() - P.t0 < SWAP_S / 2 ? P.from : P.slotTo) * 10 + P.d;
+  for (const P of [...photos].sort((a, b) => zOf(a) - zOf(b))) {
+    const up = smooth(clamp((P.d - .35) / .3)), fade = over ? up : 1 - up; if (fade <= .002) continue;
+    const r = photoRect(P), y = r.y - camY, S = photoState(P);
+    if (P.n < 2 || S.p <= 0 || y > H || y + r.h < 0) continue;
+    const key = S.lines.toFixed(3) + S.fill.toFixed(3);
+    if (key !== P.drawn) {   // redraw the brush mask only when the scroll moved it (either way)
+      const g = P.m.g; g.globalCompositeOperation = 'source-over'; g.clearRect(0, 0, P.m.c.width, P.m.c.height); g.globalCompositeOperation = 'lighter';
+      brush(g, P, S.lines, 7, '#ff0000'); brush(g, P, S.fill, 30, '#00ff00');
+      upload(P.mk, P.m.c); P.drawn = key;
+    }
+    gl.useProgram(photoP.p); gl.bindBuffer(gl.ARRAY_BUFFER, quad);
+    const q = gl.getAttribLocation(photoP.p, 'q'); gl.enableVertexAttribArray(q); gl.vertexAttribPointer(q, 2, gl.FLOAT, false, 0, 0);
+    [P.bg, P.fg, P.mk].forEach((tx, k) => { gl.activeTexture(gl.TEXTURE0 + k); gl.bindTexture(gl.TEXTURE_2D, tx); });
+    gl.uniform1i(photoP.u.bg, 0); gl.uniform1i(photoP.u.fg, 1); gl.uniform1i(photoP.u.mk, 2);
+    gl.uniform4f(photoP.u.rect, r.x, y, r.w, r.h); gl.uniform2f(photoP.u.res, W, H); gl.uniform2f(photoP.u.par, par.x, par.y);
+    gl.uniform2f(photoP.u.texel, 1.4 / P.iw, 1.4 * P.aspect / P.iw); gl.uniform1f(photoP.u.fgA, S.people); gl.uniform1f(photoP.u.lift, (1 - S.people) * .03);
+    gl.uniform1f(photoP.u.fade, fade); gl.uniform1f(photoP.u.dim, (.55 + .45 * P.d) * (1 - .22 * Math.min(P.slot, 2)));   // photos further back sit darker
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+    gl.activeTexture(gl.TEXTURE0);
+  }
+}
+// under the photos (layer C): a soft shadow once the scene is filled in, so the fish read as passing beneath
+function photoShadows(g, t) {
+  for (const P of photos) { const r = photoRect(P), S = photoState(P); if (S.p <= 0) continue;
+    g.save(); g.globalAlpha = S.fill * .9 * smooth(clamp((P.d - .35) / .3)); g.fillStyle = '#000'; g.shadowColor = 'rgba(0,0,0,.9)'; g.shadowBlur = 60; g.shadowOffsetY = 24; g.fillRect(r.x + 8, r.y - camY + 8, r.w - 16, r.h - 16); g.restore(); }
+}
+// over the photos (layer E): corner brackets that draw on with the lines & a typed caption
+function photoFrames(g, t) {
+  for (const P of photos) {
+    const r = photoRect(P), y = r.y - camY, S = photoState(P); if (S.p <= 0 || y > H || y + r.h < 0) continue;
+    const sel = P.pair ? 1 - clamp(P.slot) : 1; if (sel <= .02) continue;   // only the selected photo gets corners & a caption
+    const s = 22 * S.lines; g.save(); g.globalAlpha = sel; g.strokeStyle = `rgba(255,184,0,${.25 + .65 * P.d})`; g.lineWidth = 1.5;
+    for (const [cx, cy, dx, dy] of [[r.x, y, 1, 1], [r.x + r.w, y, -1, 1], [r.x, y + r.h, 1, -1], [r.x + r.w, y + r.h, -1, -1]]) {
+      g.beginPath(); g.moveTo(cx - dx * 8, cy + dy * (s - 8)); g.lineTo(cx - dx * 8, cy - dy * 8); g.lineTo(cx + dx * (s - 8), cy - dy * 8); g.stroke(); }
+    const n = Math.floor(S.cap * P.cap.length);
+    g.font = '500 10px JetBrains Mono'; g.fillStyle = `rgba(237,235,228,${.3 + .3 * P.d})`;
+    const capTxt = P.cap.slice(0, n).split('').join('\u200a') + (n && n < P.cap.length ? '_' : '');
+    if (P.pair) {   // captions hug their own photo; the arrows sit opposite, so a long one wraps short of them (laid out from the
+      g.textAlign = 'left';   // whole caption, so the typing never reflows)
+      const sp = s => s.split('').join('\u200a'), maxW = r.w + 8 - swapEl.offsetWidth - 28, lines = [];
+      for (const w of P.cap.split(' ')) { const l = lines.length ? lines[lines.length - 1] + ' ' + w : w; if (lines.length && g.measureText(sp(l)).width > maxW) lines.push(w); else lines[Math.max(0, lines.length - 1)] = l; }
+      let left = n; lines.forEach((l, i) => { const k = Math.min(l.length, left); left -= k + 1; if (k > 0) g.fillText(sp(l.slice(0, k)) + (n < P.cap.length && left < 0 ? '_' : ''), r.x - 8, y + r.h + 26 + i * 15); });
+    }
+    else { g.textAlign = P.side === 'l' ? 'left' : 'right'; g.fillText(capTxt, P.side === 'l' ? r.x - 8 : r.x + r.w + 8, y + r.h + 26); }
+    g.restore();
+    if (P.target) {   // runs on its own clock toward the story's value, & back to nothing once the section is left
+      const here = panes[P.k].classList.contains('in') && Math.abs(camY - P.k * H) < H * .22, want = here ? S.intel : 0, dt = Math.min(.05, t - (P.lastT || t)); P.lastT = t;
+      P.iv = (P.iv || 0) + clamp(want - (P.iv || 0), -dt * 10, dt * 4); target(g, P, r, y, P.iv);
+    }
+  }
+}
+// a face in the photo gets acquired: the box blinks on (riding the people's parallax), a leader line runs up & the file types out
+function target(g, P, r, y, s) {
+  P.file = null; P.face = null; if (s <= 0) return;
+  const [u, v, tw, th] = P.target, k = 1.025, fu = (u - .5 - par.x * .016) * k + .5, fv = (v - .5 - par.y * .016) * k + .5;
+  const bx = r.x + fu * r.w, by = y + fv * r.h, w = tw * r.w * k / 2, h = th * r.h * k / 2;
+  const blink = s < .9 ? (Math.floor(clock() * 9) % 2 ? 1 : .15) : 1, a = Math.min(w, h) * .45;
+  g.save(); g.strokeStyle = `rgba(255,42,31,${blink})`; g.lineWidth = 1.6;
+  for (const [dx, dy] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) { g.beginPath(); g.moveTo(bx + dx * w, by + dy * (h - a)); g.lineTo(bx + dx * w, by + dy * h); g.lineTo(bx + dx * (w - a), by + dy * h); g.stroke(); }
+  g.lineWidth = .8; g.strokeStyle = `rgba(255,42,31,${blink * .45})`; g.strokeRect(bx - w, by - h, w * 2, h * 2);
+  P.face = { x0: bx - w, x1: bx + w, y0: by - h, y1: by + h };   // screen coords, for the easter egg
+  const L = ease((s - .9) / .6);
+  if (L > 0) {   // a 45° leader up from the face to the open space above the photo, a short run, then the file types out
+    // laid out from where the face sits at rest, then the whole callout rides the same parallax as the face
+    const py = -par.y * .016 * k * r.h, sx = bx + w * .5, sy = by - h;   // sx already carries the sideways parallax
+    const cp = copies[P.k] ? copies[P.k].getBoundingClientRect().top : r.y - camY;
+    const ty = Math.min(r.y - camY - 34, cp - 24) + py, dx = sy - ty, tx = sx + dx + 34;   // a clear gap above the frame
+    const u1 = Math.min(1, L * 1.6), u2 = clamp((L - .62) / .38);
+    g.strokeStyle = 'rgba(255,42,31,.85)'; g.lineWidth = 1; g.beginPath(); g.moveTo(sx, sy); g.lineTo(sx + dx * u1, sy - dx * u1);
+    if (u2 > 0) g.lineTo(sx + dx + 34 * u2, ty); g.stroke();
+    if (L >= 1) { g.fillStyle = '#FF2A1F'; g.beginPath(); g.arc(tx, ty, 2.5, 0, TAU); g.fill(); }
+    P.file = { x0: tx - 10, x1: tx + 360, y0: ty - 66 + camY, y1: ty + 10 + camY };
+    let chars = (s - 1.5) * 42;
+    P.intel.forEach((line, i) => {
+      const n = Math.min(line.length, Math.floor(chars)); chars -= line.length; if (n <= 0) return;
+      g.font = i === 1 ? "900 22px 'Big Shoulders Stencil Display'" : '700 9px JetBrains Mono';
+      g.fillStyle = i === 1 ? '#EDEBE4' : i === 3 ? '#FF2A1F' : 'rgba(255,184,0,.95)';
+      g.textAlign = 'left'; g.fillText(line.slice(0, n) + (n < line.length ? '_' : ''), tx + 10, ty + [-50, -24, -12, 3][i]);
+    });
+  }
+  g.restore();
+}
+
+// ---------- 02 // HOLD THE BOTTOM: a survey plan of a dam (after the old Reclamation & TVA sheets), drawn on like a pen
+// plotter (the stroke-dashoffset technique from Vivus / Lazy Line Painter); the people on the crest & roads get tracked ----------
+const dam = (() => {
+  const el = document.getElementById('dam'); if (!el) return null;
+  const VW = 1000, VH = 620, sst = (a, b, x) => { const u = clamp((x - a) / (b - a)); return u * u * (3 - 2 * u); };
+  const cy = x => 300 + 30 * Math.sin(x * .005 + .6) + 12 * Math.sin(x * .013), hw = x => 42 + 78 * (1 - sst(430, 560, x));
+  const P = pts => 'M' + pts.map(p => p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join('L');
+  const spline = (pts, n = 10) => { const o = []; for (let i = 0; i < pts.length - 1; i++) { const a = pts[i - 1] || pts[i], b = pts[i], c = pts[i + 1], d = pts[i + 2] || c;
+    for (let j = 0; j < n; j++) { const u = j / n, u2 = u * u, u3 = u2 * u; o.push([0, 1].map(k => .5 * (2 * b[k] + (c[k] - a[k]) * u + (2 * a[k] - 5 * b[k] + 4 * c[k] - d[k]) * u2 + (3 * b[k] - a[k] - 3 * c[k] + d[k]) * u3))); } } o.push(pts[pts.length - 1]); return o; };
+  const quad = (a, c, b, n = 24) => Array.from({ length: n + 1 }, (_, i) => { const u = i / n; return [0, 1].map(k => (1 - u) * (1 - u) * a[k] + 2 * (1 - u) * u * c[k] + u * u * b[k]); });
+  const circ = (x, y, r) => `M${x - r} ${y}a${r} ${r} 0 1 0 ${2 * r} 0a${r} ${r} 0 1 0 ${-2 * r} 0`;
+  const ink = a => `rgba(255,42,31,${Math.min(1, a * 1.15)})`;   // the sheet is printed in CARP red
+  // the sheet is drawn into the WebGL backdrop (ghosted, under the fish); only the tracked people live in the DOM on top
+  const sheet = [];
+  const path = (d, o = {}) => sheet.push({ d, c: o.c || ink(.55), w: o.w || 1, fill: o.fill || 'none', dash: o.dash ? o.dash.split(' ').map(Number) : null, dl: o.dl || 0, f: !!o.f });
+  const text = (x, y, s, o = {}) => sheet.push({ text: s, x, y, size: o.size || 8.5, dl: o.dl || 1.7, rot: o.rot || 0, anchor: o.anchor, fill: o.fill });
+  const xs = []; for (let x = -10; x <= VW + 10; x += 8) xs.push(x);
+  // contours, every fifth one heavier & labeled, then the banks & a little current
+  for (let k = 1; k <= 13; k++) for (const sg of [-1, 1]) {
+    const pts = xs.map(x => [x, cy(x) + sg * (hw(x) + 17 * k + 8 * Math.sin(x * .011 + k * .25 + sg) + 4 * Math.sin(x * .029 + k * .2))]);
+    path(P(pts), { c: ink(k % 5 ? .22 : .45), dl: .04 * k + (sg > 0 ? .12 : 0) });
+    if (k % 5 === 0) { const p = pts[Math.round(pts.length * .86)]; text(p[0], p[1] - 3, String(1030 + k * 20), { size: 7.9, dl: 1.4 }); }
+  }
+  for (const sg of [-1, 1]) path(P(xs.map(x => [x, cy(x) + sg * hw(x)])), { c: ink(.8), w: 1.3, dl: .3 });
+  for (const f of [-.45, 0, .45]) path(P(xs.filter(x => x > 600).map(x => [x, cy(x) + f * hw(x)])), { f: 1, c: ink(.14), dash: '14 10', dl: 1.5 });
+  // the dam: a curved gravity section across the gorge, crest roadway, spillway piers, apron, powerhouse & intake towers
+  const X = 505, yT = cy(X) - hw(X) - 38, yB = cy(X) + hw(X) + 38, C = cy(X);
+  const up = quad([X, yT], [X - 62, C], [X, yB]), dn = quad([X + 46, yT], [X - 16, C], [X + 46, yB]), crest = quad([X + 23, yT], [X - 39, C], [X + 23, yB]);
+  path(P(up) + 'L' + P(dn.slice().reverse()).slice(1) + 'Z', { f: 1, fill: 'rgba(5,5,5,.9)', c: 'none', dl: .9 });
+  path(P(up), { c: ink(.9), w: 1.6, dl: .8 }); path(P(dn), { c: ink(.9), w: 1.6, dl: .95 });
+  path(P([up[0], dn[0]]) + P([up[up.length - 1], dn[dn.length - 1]]), { c: ink(.9), w: 1.4, dl: 1.1 });
+  path(P(crest), { f: 1, c: ink(.35), dash: '3 4', dl: 1.3 });
+  for (let i = 0; i < 7; i++) { const p = dn[9 + i]; path(P([p, [p[0] + 16, p[1]]]), { c: ink(.75), dl: 1.2 + i * .04 }); }
+  const ax = dn[12][0] + 16; path(`M${ax} ${C - 34}H${ax + 70}V${C + 34}H${ax}`, { c: ink(.7), dl: 1.3 });
+  for (let j = 1; j < 5; j++) path(`M${ax} ${C - 34 + j * 13.6}H${ax + 70}`, { c: ink(.25), dl: 1.45 });
+  const ph = [575, cy(600) + hw(600) - 4]; path(`M${ph[0]} ${ph[1]}h70v30h-70Z`, { c: ink(.85), w: 1.2, fill: 'rgba(5,5,5,.9)', dl: 1.35 });
+  for (const sg of [-1, 1]) { const tx = 455, ty = cy(455) + sg * 58; path(circ(tx, ty, 9) + circ(tx, ty, 3.5), { c: ink(.8), dl: 1.4 }); path(P([[tx + 9, ty], [X - 30, ty + sg * -2]]), { c: ink(.4), dl: 1.5 }); }
+  for (const sg of [-1, 1]) path(P(quad([395, cy(395) + sg * (hw(395) + 14)], [500, C + sg * (hw(X) + 92)], [650, cy(650) + sg * (hw(650) + 12)])), { f: 1, c: ink(.4), dash: '6 5', dl: 1.5 });
+  path(`M${X - 18} 52V${VH - 52}`, { f: 1, c: 'rgba(255,42,31,.45)', dash: '18 6 3 6', dl: 1.6 });
+  // roads & a trail: where the people walk
+  const routes = {
+    crest,
+    top: spline([[X + 23, yT], [552, yT - 34], [640, yT - 52], [720, 116], [810, 86], [905, 70], [1010, 64]]),
+    bottom: spline([[X + 23, yB], [560, yB + 24], [610, ph[1] + 52], [700, 548], [820, 574], [1010, 588]]),
+    trail: spline([[X, yT], [462, yT - 34], [395, 104], [330, 78], [272, 66]]),
+  };
+  for (const [k, r] of Object.entries(routes)) if (k !== 'crest') path(P(r), { c: ink(.6), w: 1.2, dl: 1.25 });
+  path(circ(272, 66, 13), { c: ink(.6), dl: 1.55 });
+  // the sheet: labels, north arrow, scale, title block
+  text(150, cy(150) + 5, 'R E S E R V O I R', { size: 15.0, ls: '.5em', dl: 1.6 });
+  text(52, cy(52) + hw(52) - 14, 'NORMAL POOL EL. 1215.0', { size: 7.9 }); text(900, cy(900) + 4, 'FLOW →', { size: 7.9, anchor: 'middle' });
+  text(720, cy(720) + hw(720) + 22, 'TAILWATER EL. 1032.0', { size: 7.9 });
+  text(X + 60, yT - 8, 'CREST EL. 1232.0', { size: 7.9 }); text(ph[0] + 78, ph[1] + 19, 'POWER HOUSE', { size: 7.9 });
+  text(420, cy(420) - 80, 'INTAKE TOWERS', { size: 7.9 }); text(X - 24, 60, 'AXIS OF DAM', { size: 7.9, rot: 90, fill: 'rgba(255,42,31,.7)' });
+  text(560, C - 44, 'APRON EL. 1015', { size: 7.9 }); text(272, 96, 'WEST OVERLOOK', { size: 7.9, anchor: 'middle' });
+  text(640, cy(640) - hw(640) - 30, 'DIVERSION TUNNEL', { size: 7.9, rot: -8 });
+  path(circ(950, 62, 17) + 'M950 40L955 62H945Z', { c: ink(.7), dl: 1.5 }); text(950, 34, 'N', { size: 10.0, anchor: 'middle' });
+  path('M40 588H220' + [0, 1, 2, 3].map(i => `M${40 + i * 60} 582V594`).join(''), { c: ink(.6), dl: 1.5 });
+  [0, 100, 200, 300].forEach((v, i) => text(40 + i * 60, 576, v + (i === 3 ? ' FT' : ''), { size: 7.9, anchor: 'middle' }));
+  path('M752 466H992V538H752Z', { c: ink(.6), fill: 'rgba(5,5,5,.92)', dl: 1.5 }); path('M752 488H992M872 488V538', { c: ink(.3), dl: 1.6 });
+  text(762, 481, 'CARP // FIELD SURVEY // SILURUS-02 STATION', { size: 7.9 }); text(762, 506, 'STUDY No. 02', { size: 7.9 }); text(762, 524, 'HOLD THE BOTTOM', { size: 7.9, fill: '#FF2A1F' });
+  text(882, 506, 'SHEET 2 OF 8', { size: 7.9 }); text(882, 524, 'NOT FOR CONSTRUCTION', { size: 7.1 });
+  el.innerHTML = `<svg viewBox="0 0 ${VW} ${VH}" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg"><path id="ruler"/><g class="trk"></g></svg>`;
+  const ruler = el.querySelector('#ruler');
+  for (const o of sheet) if (o.d) { o.p2d = new Path2D(o.d); if (!o.f) { ruler.setAttribute('d', o.d); o.len = ruler.getTotalLength(); } }
+  ruler.remove();
+  // the people: walking back & forth along the routes; one at the overlook hasn't moved in a while
+  const len = r => { let a = 0; r.L = r.map((p, i) => a += i ? Math.hypot(p[0] - r[i - 1][0], p[1] - r[i - 1][1]) : 0); return a; };
+  for (const r of Object.values(routes)) r.total = len(r);
+  const at = (r, s) => { let i = r.L.findIndex(v => v >= s); if (i <= 0) return r[Math.max(0, i)]; const f = (s - r.L[i - 1]) / (r.L[i] - r.L[i - 1] || 1); return [r[i - 1][0] + (r[i][0] - r[i - 1][0]) * f, r[i - 1][1] + (r[i][1] - r[i - 1][1]) * f]; };
+  const folks = [['crest', .1, 13], ['crest', .72, -10], ['top', .3, 15], ['top', .78, -12], ['bottom', .45, 11], ['trail', .4, 8], ['trail', .99, 0]];
+  const g = el.querySelector('.trk'), pos = folks.map(() => [0, 0]);
+  const LOCK = { 2: 'KOI-01', 4: 'SILURUS-02' };   // each fish's laser holds a walker: one on the top road, one on the bottom
+  const nodes = folks.map(([r, u, v], i) => {
+    const n = document.createElementNS('http://www.w3.org/2000/svg', 'g'), hot = !v || LOCK[i], c = hot ? '#FF2A1F' : '#FFB800';
+    if (hot) n.setAttribute('class', 'hot');
+    const sub = (v ? (Math.abs(v) / 9.3).toFixed(1) + ' M/S' : 'LOITERING') + (LOCK[i] ? ' // LOCKED' : '');
+    n.innerHTML = `<circle r="3.6" fill="${hot ? c : '#EDEBE4'}"/><path d="M-14 -7V-14H-7M7 -14H14V-7M14 7V14H7M-7 14H-14V7" fill="none" stroke="${c}" stroke-width="1.2"/>`
+      + `<text x="19" y="-4">TGT-${String(i + 1).padStart(2, '0')}</text><text x="19" y="10" style="opacity:.8">${sub}</text>`;
+    g.appendChild(n); return n;
+  });
+  let T = 0;
+  return {
+    el, cy, k: panes.findIndex(p => p.id === 'p2'),
+    toPage(x, y) { const r = el.getBoundingClientRect(), k = Math.max(r.width / VW, r.height / VH); return { x: r.left + (r.width - VW * k) / 2 + x * k, y: r.top + camY + (r.height - VH * k) / 2 + y * k }; },
+    update(t, p) {
+      T = (still ? 1 : p) * 4.6;   // the sheet plots on with the scroll, then the people get picked up
+      g.style.opacity = clamp((T - 3.4) / .5);
+      // the sheet is cropped to fill the screen, so a walker can stroll past the edge: pin it inside the visible part (clear of
+      // the nav, the ticker & the fleet controls) so you can always see what the fish are locked on to. Near the right edge its label flips left.
+      const k = Math.max(W / VW, H / VH), ox = (W - VW * k) / 2, oy = (H - VH * k) / 2;
+      const x0 = (28 - ox) / k + 15, x1 = (W - 28 - ox) / k - 15, y0 = (96 - oy) / k + 15, y1 = (H - 140 - oy) / k - 15;   // 15: the bracket
+      folks.forEach(([rk, u, v], i) => { const r = routes[rk], m = ((u * r.total + v * t) % (2 * r.total) + 2 * r.total) % (2 * r.total), q = at(r, m < r.total ? m : 2 * r.total - m);
+        pos[i] = [clamp(q[0] + (v ? 0 : Math.sin(t * 1.3) * 1.5), x0, x1), clamp(q[1], y0, y1)];
+        nodes[i].classList.toggle('l', pos[i][0] > x1 - 120 / k);
+        nodes[i].setAttribute('transform', `translate(${pos[i][0].toFixed(1)} ${pos[i][1].toFixed(1)})`); });
+    },
+    // where a fish's laser goes: its locked target, once the targets are up
+    lock(i) { const k = i === 0 ? 2 : 4; return T > 3.6 ? this.toPage(...pos[k]) : null; },
+    draw(gc, alpha) {   // the ghosted sheet, into the backdrop canvas, scrubbed by the same progress
+      const k = Math.max(W / VW, H / VH), ox = (W - VW * k) / 2, oy = this.k * H - camY + (H - VH * k) / 2;
+      if (oy > H || oy + VH * k < 0 || T <= 0) return;
+      gc.save(); gc.setTransform(DPR * k, 0, 0, DPR * k, DPR * ox, DPR * oy);
+      for (const o of sheet) {
+        if (o.text) { const a = clamp((T - o.dl) / .8); if (a <= 0) continue;
+          gc.globalAlpha = alpha * a; gc.font = `500 ${o.size}px 'JetBrains Mono'`; gc.fillStyle = o.fill || 'rgba(255,70,50,.85)'; gc.textAlign = o.anchor === 'middle' ? 'center' : 'left';
+          if (o.rot) { gc.save(); gc.translate(o.x, o.y); gc.rotate(o.rot * Math.PI / 180); gc.fillText(o.text, 0, 0); gc.restore(); } else gc.fillText(o.text, o.x, o.y); continue; }
+        const a = o.f ? clamp((T - o.dl) / .8) : smooth(clamp((T - o.dl) / 1.9)); if (a <= 0) continue;
+        if (o.fill !== 'none') { gc.globalAlpha = o.f ? a : alpha * a; gc.fillStyle = o.fill; gc.fill(o.p2d); }
+        if (o.c !== 'none') { gc.strokeStyle = o.c; gc.lineWidth = o.w;
+          if (o.f) { gc.globalAlpha = alpha * a; gc.setLineDash(o.dash || []); } else { gc.globalAlpha = alpha; gc.setLineDash([o.len * a, o.len + 1]); }
+          gc.stroke(o.p2d); }
+      }
+      gc.restore(); gc.setLineDash([]);
+    },
+  };
+})();
+
+// ---------- click: a sonar ping where the fleet is headed, a pinpoint until they get there ----------
+const pings = []; let actx = null, pin = null;
+function pingSound() {
+  try {
+    actx = actx || new (window.AudioContext || window.webkitAudioContext)(); if (actx.state === 'suspended') actx.resume();
+    const t = actx.currentTime, o = actx.createOscillator(), g = actx.createGain(), lp = actx.createBiquadFilter(), d = actx.createDelay(), fb = actx.createGain();
+    o.type = 'sine'; o.frequency.setValueAtTime(1500, t); o.frequency.exponentialRampToValueAtTime(1340, t + 1.3);
+    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(.2, t + .006); g.gain.exponentialRampToValueAtTime(.0001, t + 1.5);
+    lp.type = 'lowpass'; lp.frequency.value = 2400; d.delayTime.value = .3; fb.gain.value = .3;
+    o.connect(g); g.connect(lp); lp.connect(actx.destination); lp.connect(d); d.connect(fb); fb.connect(d); d.connect(actx.destination);
+    o.start(t); o.stop(t + 1.6);
+  } catch (e) {}
+}
+function drawPings(g, t) {
+  for (let i = pings.length - 1; i >= 0; i--) {
+    const p = pings[i], a = t - p.t; if (a > 1.6) { pings.splice(i, 1); continue; }
+    const x = p.x, y = p.y - camY; g.save(); g.lineWidth = 1.2;
+    for (let k = 0; k < 3; k++) { const u = clamp((a - k * .16) / 1.2); if (u <= 0 || u >= 1) continue; g.strokeStyle = `rgba(255,${k ? 184 : 60},${k ? 0 : 40},${(1 - u) * .85})`; g.beginPath(); g.arc(x, y, 8 + ease(u) * 120, 0, TAU); g.stroke(); }
+    g.restore();
+  }
+  if (goal) pin = { x: goal.x, y: goal.y, a: 1 }; else if (pin) pin.a -= .03;
+  if (pin && pin.a > 0) {
+    const x = pin.x, y = pin.y - camY, s = 11; g.save(); g.globalAlpha = pin.a;
+    g.fillStyle = '#FF2A1F'; g.shadowColor = 'rgba(255,42,31,.9)'; g.shadowBlur = 14; g.beginPath(); g.arc(x, y, 3.2, 0, TAU); g.fill(); g.shadowBlur = 0;
+    g.strokeStyle = 'rgba(255,42,31,.8)'; g.lineWidth = 1.2; g.beginPath(); g.arc(x, y, s + Math.sin(t * 6) * 1.5, 0, TAU); g.stroke();
+    for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) { g.beginPath(); g.moveTo(x + dx * (s + 4), y + dy * (s + 4)); g.lineTo(x + dx * (s + 10), y + dy * (s + 10)); g.stroke(); }
+    g.font = '700 10px JetBrains Mono'; g.fillStyle = 'rgba(255,42,31,.95)'; g.fillText('WAYPOINT', x + s + 14, y + 3.5);
+    g.restore();
+  }
+}
+function setPane(k) {
+  pane = clamp(k, 0, panes.length - 1); goal = null;
+  dots.forEach((d, i) => d.classList.toggle('on', i === pane)); links.forEach(a => a.classList.toggle('on', +a.dataset.go === pane));
+}
+// a "next" button: the fish set off first, then the page follows them down
+// The story sections pin while you scroll through them (a hold of HOLD x the screen height): the camera stays put & the
+// section's progress runs 0 -> 1, then the camera moves on to the next. The same map drives the WebGL world & the DOM.
+const HOLD = 1.4, progress = panes.map((_, k) => k ? 0 : 1);
+// what a section shows: the scroll starts its story & can push it along, but once started it plays to the end on its own
+// (a section left mid-scroll never freezes half drawn). Scrolling back above it resets it, so it plays again.
+const reveal = progress.slice(), revealAt = progress.map(() => 0), REVEAL_S = 2.6;
+function tickReveal(k) {
+  if (still || !k) { reveal[k] = 1; return; }
+  const t = clock();
+  if (progress[k] > .02 && !revealAt[k]) revealAt[k] = t - progress[k] * REVEAL_S;
+  if (progress[k] <= 0 && camY < k * H - H * .5) revealAt[k] = 0;
+  reveal[k] = revealAt[k] ? Math.max(progress[k], clamp((t - revealAt[k]) / REVEAL_S)) : progress[k];
+}
+let segs = [], sy = 0, tween = null, going = false;   // going: the fish have set off, the page hasn't moved yet
+function layoutScroll() {
+  let s = 0; segs = panes.map((el, k) => { const o = { s, hold: el.classList.contains('photo') || el.hasAttribute('data-dam') ? H * HOLD : 0 }; s += o.hold + H; return o; });
+  const last = segs[segs.length - 1]; document.getElementById('spacer').style.height = (last.s + last.hold + H) + 'px';
+}
+function world(y) {
+  let cam = 0;
+  segs.forEach((o, k) => { const local = y - o.s; progress[k] = o.hold ? clamp(local / o.hold) : local >= 0 ? 1 : 0; tickReveal(k);
+    if (local >= 0) cam = k * H + Math.max(0, Math.min(H, local - o.hold)) * (k < segs.length - 1 ? 1 : 0); });
+  return cam;
+}
+function scrollToY(y, dur) { if (still) { scrollTo(0, y); return; } tween = { from: scrollY, to: y, t0: clock(), dur }; }
+for (const ev of ['wheel', 'touchstart', 'keydown']) addEventListener(ev, () => { tween = null; }, { passive: true });
+// a "next" button: the fish set off first, the page follows them down, then the section lands & reveals itself
+const wipeEl = document.getElementById('wipe');
+function wipeTo(k) {   // cover, cut to the section (the fleet comes along), uncover; the section's story then plays in
+  const dir = k > pane ? 'down' : 'up'; wipeEl.dataset.dir = dir; wipeEl.className = 'wipe mono';
+  document.getElementById('wipeT').textContent = `Rerouting // sector ${String(k).padStart(2, '0')}`;
+  void wipeEl.offsetWidth; wipeEl.classList.add('in'); tween = null; going = true;
+  setTimeout(() => {
+    const o = segs[k], to = o.s + o.hold * .03; revealAt[k] = 0;
+    scrollTo(0, to); sy = to; const before = camY; camY = world(sy); const dy = camY - before;
+    for (const f of fleet) { f.y += dy; for (const q of f.trail) q.y += dy; if (f.c) f.c.y += dy; }
+    wps.length = 0; goal = null; going = false; setPane(k);
+    wipeEl.classList.remove('in'); wipeEl.classList.add('out');
+  }, 380);
+}
+function go(k) {   // the fish set off first; the page follows them down & plays the section's story on the way in
+  if (!still && Math.abs(k - pane) > 1) return wipeTo(k);   // more than one section away: the / wipe
+  setPane(k); const o = segs[pane], to = o.s + o.hold, dist = Math.abs(to - scrollY) / H;
+  going = true; setTimeout(() => { going = false; scrollToY(to, clamp(.9 + dist * .8, .9, 4.2)); }, still ? 0 : 450);
+}
+document.querySelectorAll('[data-go]').forEach(b => b.addEventListener('click', () => go(+b.dataset.go)));
+// the scroll watcher: at a story stop (a section's landing) it says "scroll to continue"; anywhere between stops it gets
+// louder ("keep scrolling") & shows how far through the section's story you are. At the end it offers the way back up.
+const watchEl = document.getElementById('watch'), watchT = document.getElementById('watchT'), watchBar = document.getElementById('watchBar');
+let watchState = '';
+function watchTick() {
+  const y = scrollY; let k = 0; segs.forEach((o, i) => { if (y >= o.s - 1) k = i; });
+  const o = segs[k], local = y - o.s, last = k === segs.length - 1;
+  const stop = Math.abs(local - o.hold) < H * .04 || (o.hold && local < o.hold * .05);   // go() lands at the end of a hold, the / wipe just inside it
+  const state = going || tween ? 'move' : last && stop ? 'end' : stop ? 'rest' : 'mid';
+  watchBar.style.transform = `scaleX(${local < o.hold ? local / o.hold : clamp((local - o.hold) / H)})`;
+  if (state === watchState) return; watchState = state;
+  watchEl.classList.remove('rest', 'mid', 'end', 'move'); watchEl.classList.add(state);
+  if (state !== 'move') watchT.textContent = state === 'end' ? '▲ Back to the surface' : state === 'mid' ? 'Keep scrolling' : 'Scroll to continue';
+}
+watchEl.addEventListener('click', () => { if (watchState === 'end') go(0); });
+document.getElementById('home').onclick = () => go(0);
+
+
+const STORY = ['▲ Armored attack fish // gov’t issue', '▲ Every pond is a perimeter', '▲ Nobody suspects the fish', '▲ KOI-class // pond infiltration', '▲ SILURUS // holds the bottom', '▲ Peace through superior fins'];
+const storyEl = document.getElementById('story');
+function typeStory(t) {
+  if (t < HEAD_AT - .3) return;
+  const k = Math.floor((t - (HEAD_AT - .3)) / 4.5) % STORY.length, u = ((t - (HEAD_AT - .3)) % 4.5);
+  const txt = STORY[k], n = Math.min(txt.length, Math.floor(u * 40)), out = u > 4.1 ? Math.floor((4.5 - u) / .4 * txt.length) : n;
+  storyEl.textContent = txt.slice(0, Math.max(0, out)) + (u < 4.1 && n < txt.length ? '_' : '');
+}
+const tele = document.getElementById('tele'), BOOT = ['INITIALIZING CARP-AQ', 'SONAR ARRAY // ONLINE', 'KOI-01 // HANDSHAKE OK', 'SILURUS-02 // HANDSHAKE OK', 'WEAPONS FREE'];
+function telemetry(t) {
+  if (t < REST_AT) {
+    const lines = BOOT.map((l, k) => { const a = .2 + k * .55, n = Math.floor(clamp((t - a) / .4) * l.length); return n ? `${l.slice(0, n)}${n < l.length ? '_' : ' <b>✓</b>'}` : ''; }).filter(Boolean);
+    tele.innerHTML = lines.join('<br>'); return;
+  }
+  const depth = (1.2 + pane * .8 + Math.sin(t * .3) * .08).toFixed(2), threat = ['ELEVATED', 'SEVERE', 'DELICIOUS'][Math.floor(t / 5) % 3];
+  tele.innerHTML = `<b>● SONAR ACTIVE</b><br>Contacts <b>${String(fleet.length).padStart(2, '0')}</b><br>Depth ${depth} M<br>Water temp ${(18.4 - pane * .6).toFixed(1)} °C<br>Threat level <span class="r">${threat}</span>`;
+}
+document.getElementById('tick').textContent = ('▲ ARMORED ATTACK FISH  ▲ KOI-CLASS POND INFILTRATOR  ▲ SILURUS BOTTOM-DWELLER  ▲ AUTHORIZED PERSONNEL ONLY  ▲ NOBODY SUSPECTS THE FISH  ▲ PEACE THROUGH SUPERIOR FINS  ').repeat(4);
+const cue = (at, fn) => setTimeout(fn, still ? 0 : at * 1000);
+cue(.05, () => document.body.classList.add('on'));
+cue(HEAD_AT, () => document.getElementById('headline').classList.add('in'));
+cue(HEAD_AT + 1.1, () => document.getElementById('lede').classList.add('in'));
+cue(HEAD_AT + 1.4, () => document.querySelectorAll('#brief, #clear').forEach(e => e.classList.add('in')));
+cue(REST_AT, () => document.querySelectorAll('nav .late, #units, #ticker, #pager, #watch').forEach(e => e.classList.add('in')));
+
+const dlg = document.getElementById('dlg');
+function say(k, h, p) { document.getElementById('dk').textContent = k; document.getElementById('dh').textContent = h; document.getElementById('dp').textContent = p; dlg.showModal(); }
+const clearance = () => say('Clearance', 'We make attack fish.', 'Each CARP unit is a living fish in articulated armor, with low-light eyes & a target designator. They patrol, they watch & they report. Nobody suspects the fish.');
+document.getElementById('clear').onclick = clearance; document.getElementById('brief2').onclick = clearance;
+document.getElementById('demo').onclick = () => say('Live fire', 'Demonstrations are held in a secure pond.', 'Bring clearance & a towel.');
+
+// ---------- frame ----------
+let prev = clock(), fontsReady = false;
+document.fonts.load("900 100px 'Big Shoulders Stencil Display'").then(() => { fontsReady = true; layoutWord(); });
+function refit() { resize(); layoutScroll(); if (fontsReady) layoutWord(); for (const f of fleet) if (!f.entered) f.reset(); }   // fish made before the size is known start at 0,0
+addEventListener('resize', refit);
+refit();
+function frame() {
+  const t = clock(), dt = clamp(t - prev, 0, .05); prev = t;   // never a backward step
+  if (W !== innerWidth || H !== innerHeight) refit();
+  if (tween) { const u = clamp((t - tween.t0) / tween.dur); scrollTo(0, tween.from + (tween.to - tween.from) * smooth(u)); if (u >= 1) tween = null; }
+  sy += (scrollY - sy) * Math.min(1, dt * 7); if (Math.abs(scrollY - sy) < .5) sy = scrollY;   // land exactly: the easing alone never arrives, so the last section (no hold) never revealed
+  camY = world(sy); watchTick();
+  main.style.transform = `translate3d(0, ${-camY}px, 0)`;
+  copies.forEach((c, j) => { if (c) c.style.translate = `0 ${((j * H - camY) * -.05).toFixed(1)}px`; });   // the copy leads the page a little
+  const k = Math.round(camY / H); if (k !== pane && !tween && !going) setPane(k);
+  panes.forEach((el, j) => { if (!j) return; const on = Math.abs(camY - j * H) < H * .3 && reveal[j] > .3, off = reveal[j] < .2 || Math.abs(camY - j * H) > H * .6;
+    if (on) el.classList.add('in'); else if (off) el.classList.remove('in'); });
+  if (goal && (t > goal.until || fleet.every(f => Math.hypot(f.x - goal.x, f.y - goal.y) < f.len * .55))) goal = null;   // arrived
+  updateBarriers(); if (!still && t > FISH_AT) for (const f of [...fleet, ...leavers]) f.step(dt, t); wakes(t);
+  for (let j = leavers.length - 1; j >= 0; j--) {   // gone once the whole body is off the screen (or after 15 s, whatever happens)
+    const f = leavers[j], pad = f.len * .15, out = q => q.x < -pad || q.x > W + pad || q.y - camY < -pad || q.y - camY > H + pad;
+    if (still || clock() - f.leaving > 15 || [0, .25, .5, .75, 1].every(u => out(f.pt(f.len * u)))) leavers.splice(j, 1);
+  }
+  drawBackdrop(t); if (fontsReady) drawWord(t);
+  gl.bindFramebuffer(gl.FRAMEBUFFER, fbo); gl.viewport(0, 0, W * DPR, H * DPR);
+  gl.enable(gl.BLEND); gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+  gl.clearColor(0, 0, 0, 1); gl.clear(gl.COLOR_BUFFER_BIT);
+  drawLayer(0, A.c);
+  drawPhotos(t, dt, false);
+  const ms = [drawFish(fleet[0]), null, null];
+  D.g.clearRect(0, 0, W, H); laser(D.g, t, fleet[0], ms[0], 0); drawLayer(3, D.c);   // the koi's beam sits under the word, like the koi
+  const frost = fontsReady && camY < wordCY + wordFont;
+  if (frost) {   // copy the scene so far into the second buffer, blurred under the letters, & keep drawing there
+    upload(layerTex[5], M.c);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, fbo2); gl.disable(gl.BLEND); gl.useProgram(frostP.p); gl.bindBuffer(gl.ARRAY_BUFFER, quad);
+    const fq = gl.getAttribLocation(frostP.p, 'q'); gl.enableVertexAttribArray(fq); gl.vertexAttribPointer(fq, 2, gl.FLOAT, false, 0, 0);
+    gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D, layerTex[5]); gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, sceneTex);
+    gl.uniform1i(frostP.u.s, 0); gl.uniform1i(frostP.u.m, 1); gl.uniform2f(frostP.u.px, 1 / (W * DPR), 1 / (H * DPR));
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4); gl.enable(gl.BLEND);
+  }
+  drawLayer(1, B.c);
+  if (fleet[1]) ms[1] = drawFish(fleet[1]);
+  if (fleet[2]) ms[2] = drawFish(fleet[2]);
+  for (const f of leavers) drawFish(f);
+  C.g.clearRect(0, 0, W, H); photoShadows(C.g, t);
+  if (fleet[1]) laser(C.g, t, fleet[1], ms[1], 1);
+  fleet.forEach((f, k) => tag(C.g, t, f, ms[k], k));
+  drawLayer(2, C.c);
+  gl.bindFramebuffer(gl.FRAMEBUFFER, null); gl.viewport(0, 0, W * DPR, H * DPR); gl.disable(gl.BLEND);
+  gl.useProgram(waterP.p); gl.bindBuffer(gl.ARRAY_BUFFER, quad);
+  const q = gl.getAttribLocation(waterP.p, 'q'); gl.enableVertexAttribArray(q); gl.vertexAttribPointer(q, 2, gl.FLOAT, false, 0, 0);
+  gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, frost ? sceneTex2 : sceneTex); gl.uniform1i(waterP.u.s, 0);
+  gl.uniform2f(waterP.u.res, W, H); gl.uniform1f(waterP.u.t, t); gl.uniform1f(waterP.u.dpr, DPR); gl.uniform1f(waterP.u.cam, camY); gl.uniform4fv(waterP.u.rip, rip); gl.uniform4fv(waterP.u.wake, wake);
+  gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+  // above the water: the photos up front (so the parallax reads cleanly), then frames, captions, pings
+  gl.enable(gl.BLEND); gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+  drawPhotos(t, dt, true);
+  E.g.clearRect(0, 0, W, H); photoFrames(E.g, t); drawPings(E.g, t); drawLayer(4, E.c);
+  autoSwap(t); placeSwap(); telemetry(t); typeStory(t); if (dam && Math.abs(camY - dam.k * H) < H) dam.update(t, reveal[dam.k]);
+  requestAnimationFrame(frame);
+}
+frame();
+</script>
+</body>
+</html>
