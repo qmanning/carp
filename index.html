@@ -103,7 +103,7 @@
      centred on the label with flex */
   .adv { display: inline-flex; align-items: center; gap: 9px; }
   .adv .arr { display: flex; flex-direction: column; align-items: center; gap: 1px; }
-  .adv .arr i { display: block; width: 0; height: 0; border-left: 4px solid transparent; border-right: 4px solid transparent; border-top: 4px solid currentColor; opacity: .2; animation: trail 1.2s linear infinite; }
+  .adv .arr i { display: block; width: 8px; height: 4px; background: currentColor; clip-path: polygon(0 0, 100% 0, 50% 100%);   /* a vector shape, so it stays sharp when the copy is scaled (border triangles went soft) */ opacity: .2; animation: trail 1.2s linear infinite; }
   .adv .arr i:nth-child(2) { animation-delay: .2s; }
   .adv .arr i:nth-child(3) { animation-delay: .4s; }
   @media (prefers-reduced-motion: reduce) { .adv .arr i { animation: none; opacity: 1; } }
@@ -262,8 +262,9 @@ const TAU = Math.PI * 2, clamp = (x, a = 0, b = 1) => Math.max(a, Math.min(b, x)
 const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const canvas = document.getElementById('gl');
 const gl = canvas.getContext('webgl2', { antialias: true, premultipliedAlpha: true, alpha: false });
-let W = 0, H = 0, DPR = 1, camY = 0, UX = 1;
-const TOUCH = matchMedia('(pointer: coarse)').matches;   // iPads & phones
+let W = 0, H = 0, IH = 0, DPR = 1, camY = 0, UX = 1, LOWFX = false;
+const TOUCH = matchMedia('(pointer: coarse)').matches;
+const SAFARI = /^((?!chrome|android|crios|fxios|edg).)*safari/i.test(navigator.userAgent);   // Safari (Mac & iPad), not Chrome/Firefox/Edge
 
 // ---------- 2D layers, uploaded as textures each frame ----------
 // A sonar backdrop · D the koi's laser (under the word, like the koi) · B the giant word · C the catfish's laser & HUD
@@ -329,8 +330,7 @@ void main() {
   vec2 uv = (px + d) / res; uv.y = 1. - uv.y;
   float ca = 1.4 / res.x;
   vec3 col = vec3(texture(s, uv + vec2(ca, 0)).r, texture(s, uv).g, texture(s, uv - vec2(ca, 0)).b);
-  float c = caust(wpx * .011 + d * .02, t * .9) + caust(wpx * .007 - vec2(t * .02, 0), t * .6) * .6;
-  col += vec3(.55, .78, .82) * c * .018 + vec3(1., .25, .15) * c * .006 + vec3(.6, .8, .85) * glint * .22;
+  col += vec3(.6, .8, .85) * glint * .22;   // (the drifting caustic light is gone: Q 2026-11-08, barely seen & 8 sines a pixel)
   col *= .96 + .04 * sin(px.y * 3.14159 / dpr);
   o = vec4(col, 1);
 }`);
@@ -372,8 +372,22 @@ function placeCopies() {
     const sc = Math.max(1, fit).toFixed(3); if (el.style.scale !== sc) el.style.scale = sc;
   }
 }
+// the height the fixed bars (ticker, units) actually sit in: iPad Chrome & Safari can report an innerHeight taller than
+// what's on screen while their toolbars settle, which pushed the hero's NEXT button under the ticker (Q, iPad 2026-11-08)
+const vprobe = Object.assign(document.createElement('div'), { style: 'position:fixed;top:0;left:0;width:0;height:100%;pointer-events:none;visibility:hidden' });
+document.body.appendChild(vprobe);
+function viewH() { return Math.round(Math.min(innerHeight, vprobe.getBoundingClientRect().height || innerHeight, visualViewport ? visualViewport.height * visualViewport.scale : innerHeight)); }
 function resize() {
-  DPR = Math.min(devicePixelRatio || 1, 1.5); W = innerWidth; H = innerHeight;
+  W = innerWidth; H = viewH(); IH = innerHeight;
+  // 1.5x at most; 1x on very big screens (a 5120 monitor), where 1.5x was ~6M pixels a frame for detail no one sees (Q 2026-11-08)
+  DPR = (devicePixelRatio || 1) * W >= 3800 ? 1 : Math.min(devicePixelRatio || 1, 1.5);
+  // ?res=0.75 (or any 0.5 to 2) forces the render scale, for filming a big monitor: lower = smoother fish
+  const RES = +new URLSearchParams(location.search).get('res'); if (RES >= .5 && RES <= 2) DPR = RES;
+  // no soft glows (canvas shadowBlur) on iPads & very big screens: they're slow there & barely show
+  // & in Safari, whose canvas glows & canvas-to-WebGL uploads are far slower than Chrome's (Q 2026-11-08: "really really slow")
+  LOWFX = TOUCH || SAFARI || DPR === 1 && (devicePixelRatio || 1) * W >= 3800;
+  if (SAFARI && !RES) DPR = Math.min(DPR, 1);
+  for (const L of [A, B, C, D, E, M]) if (LOWFX && !L.noGlow) { L.noGlow = true; Object.defineProperty(L.g, 'shadowBlur', { get: () => 0, set() {} }); }
   // wide screens: the type & chrome grow with the width (1.5 at 2560x1080, a 5120x2160 monitor at 2x; 3 at 1x), capped at 3.2
   UX = W / H >= 1.9 && W >= 1900 ? Math.min(3.2, Math.max(1, W / 1700)) : 1;
   document.documentElement.style.setProperty('--ux', UX); document.documentElement.classList.toggle('wide', UX > 1);
@@ -771,8 +785,8 @@ function drawPuffer(t) {
   draw(k, 1 - b, false);
   if (b > .002) draw(k + 1, b, false);
 }
-function drawLayer(i, src) {
-  upload(layerTex[i], src);
+function drawLayer(i, src, keep) {
+  if (!keep) upload(layerTex[i], src);
   gl.useProgram(layerP.p); gl.bindBuffer(gl.ARRAY_BUFFER, quad);
   const q = gl.getAttribLocation(layerP.p, 'q'); gl.enableVertexAttribArray(q); gl.vertexAttribPointer(q, 2, gl.FLOAT, false, 0, 0);
   gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, layerTex[i]); gl.uniform1i(layerP.u.s, 0); gl.uniform1f(layerP.u.a, 1);
@@ -830,7 +844,15 @@ function layoutWord() {
 }
 // how far the letters' fill sinks to glass after landing: .93 = see-through glass, 0 = solid (Q 2026-11-05: 75% opaque)
 const SINK = .25;
+// once the letters have landed & sunk & the page isn't moving, the word doesn't change: skip drawing it & re-uploading it
+// (except the odd glitch frame & the one after it, to clear it)
+let wordKey = '', wordGlitch = false;
 function drawWord(t) {
+  const settled = still || t > LETTER_AT[4] + 3.6, jolt = settled && Math.random() < .1;
+  const key = settled && !jolt && !wordGlitch ? camY.toFixed(1) + '/' + W + 'x' + H + '/' + wordFont : '';
+  wordGlitch = jolt;
+  if (key && key === wordKey) return false;
+  wordKey = key;
   const g = B.g, m = M.g; g.clearRect(0, 0, W, H); m.clearRect(0, 0, W, H);
   const cy = wordCY - camY; if (cy < -wordFont) return;
   m.font = `900 ${wordFont}px 'Big Shoulders Stencil Display'`; m.textAlign = 'center'; m.textBaseline = 'alphabetic';
@@ -839,7 +861,7 @@ function drawWord(t) {
   [...WORD].forEach((ch, k) => {
     const u = still ? 1 : ease((t - LETTER_AT[k]) / .55); if (u <= 0) return;
     if (!landed[k] && u > .55) { landed[k] = true; ripple(letterX[k], wordCY, t, k === 4 ? 1.4 : 1.1); }
-    const s = 1 + (1 - u) * .6, glitch = (1 - u) * 30 + (Math.random() < .02 ? 6 : 0), dot = ch === '.';
+    const s = 1 + (1 - u) * .6, glitch = (1 - u) * 30 + ((settled ? jolt && Math.random() < .2 : Math.random() < .02) ? 6 : 0), dot = ch === '.';
     g.save(); g.translate(letterX[k], cy - (1 - u) * 40); g.scale(s, s); g.translate(0, capH / 2); g.globalAlpha = u;
     // each letter lands bright, then the fill sinks to glass (Q 2026-11-01): the fish behind it read through, blurred
     // (the frost pass uses M), & a bright red outline holds the shape
@@ -847,12 +869,13 @@ function drawWord(t) {
     m.save(); m.translate(letterX[k], cy - (1 - u) * 40); m.scale(s, s); m.translate(0, capH / 2); m.fillStyle = `rgba(255,255,255,${u})`; m.fillText(ch, 0, 0); m.restore();
     g.fillStyle = `rgba(255,42,31,${.55 * (1 - sink * .7)})`; g.fillText(ch, -6 - glitch, 0);
     g.fillStyle = `rgba(0,200,255,${.22 * (1 - sink * .7)})`; g.fillText(ch, 6 + glitch, 0);
-    g.shadowColor = 'rgba(255,42,31,.4)'; g.shadowBlur = 60 * (1 - sink); g.fillStyle = dot ? `rgba(255,42,31,${1 - sink})` : `rgba(237,235,228,${1 - sink})`; g.fillText(ch, 0, 0);
+    g.fillStyle = dot ? `rgba(255,42,31,${1 - sink})` : `rgba(237,235,228,${1 - sink})`; g.fillText(ch, 0, 0);
     g.shadowBlur = 0; g.strokeStyle = '#FF2A1F'; g.lineWidth = Math.max(1.5, wordFont * .005) / s; g.globalAlpha = SINK ? u * sink / SINK * .5 : 0; g.strokeText(ch, 0, 0);   // the outline at half strength
     g.restore();
   });
   const n = still ? SUB.length : Math.floor(clamp((t - SUB_AT) / 1.1) * SUB.length);
   if (eyebrow.textContent.length !== n) eyebrow.textContent = SUB.slice(0, n);
+  return true;
 }
 // ---------- backdrop: a quiet scrolling grid; the sonar on the hero & again on the close ----------
 function radar(g, t, cx, cy, a) {
@@ -1432,10 +1455,12 @@ let prev = clock(), fontsReady = false;
 document.fonts.load("900 100px 'Big Shoulders Stencil Display'").then(() => { fontsReady = true; layoutWord(); });
 function refit() { resize(); layoutScroll(); if (fontsReady) layoutWord(); for (const f of fleet) if (!f.entered) f.reset(); }   // fish made before the size is known start at 0,0
 addEventListener('resize', refit);
+if (window.visualViewport) visualViewport.addEventListener('resize', () => { if (viewH() !== H) refit(); });
+addEventListener('orientationchange', () => setTimeout(refit, 300)); addEventListener('load', () => setTimeout(() => { if (viewH() !== H) refit(); }, 500));
 refit();
 function frame() {
   const t = clock(), dt = clamp(t - prev, 0, .05); prev = t;   // never a backward step
-  if (W !== innerWidth || H !== innerHeight) refit();
+  if (W !== innerWidth || IH !== innerHeight) refit();
   if (tween) { const u = clamp((t - tween.t0) / tween.dur); scrollTo(0, tween.from + (tween.to - tween.from) * smooth(u)); if (u >= 1) tween = null; }
   sy += (scrollY - sy) * Math.min(1, dt * 7); if (Math.abs(scrollY - sy) < .5) sy = scrollY;   // land exactly: the easing alone never arrives, so the last section (no hold) never revealed
   camY = world(sy); watchTick();
@@ -1451,7 +1476,7 @@ function frame() {
     const f = leavers[j], pad = f.len * .15, out = q => q.x < -pad || q.x > W + pad || q.y - camY < -pad || q.y - camY > H + pad;
     if (still || clock() - f.leaving > 15 || [0, .25, .5, .75, 1].every(u => out(f.pt(f.len * u)))) leavers.splice(j, 1);
   }
-  drawBackdrop(t); if (fontsReady) drawWord(t);
+  drawBackdrop(t); const wordNew = fontsReady ? drawWord(t) !== false : true;
   gl.bindFramebuffer(gl.FRAMEBUFFER, fbo); gl.viewport(0, 0, W * DPR, H * DPR);
   gl.enable(gl.BLEND); gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
   gl.clearColor(0, 0, 0, 1); gl.clear(gl.COLOR_BUFFER_BIT);
@@ -1461,14 +1486,14 @@ function frame() {
   D.g.clearRect(0, 0, W, H); laser(D.g, t, fleet[0], ms[0], 0); drawLayer(3, D.c);   // the koi's beam sits under the word, like the koi
   const frost = fontsReady && camY < wordCY + wordFont;
   if (frost) {   // copy the scene so far into the second buffer, blurred under the letters, & keep drawing there
-    upload(layerTex[5], M.c);
+    if (wordNew) upload(layerTex[5], M.c);
     gl.bindFramebuffer(gl.FRAMEBUFFER, fbo2); gl.disable(gl.BLEND); gl.useProgram(frostP.p); gl.bindBuffer(gl.ARRAY_BUFFER, quad);
     const fq = gl.getAttribLocation(frostP.p, 'q'); gl.enableVertexAttribArray(fq); gl.vertexAttribPointer(fq, 2, gl.FLOAT, false, 0, 0);
     gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D, layerTex[5]); gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, sceneTex);
     gl.uniform1i(frostP.u.s, 0); gl.uniform1i(frostP.u.m, 1); gl.uniform2f(frostP.u.px, 1 / (W * DPR), 1 / (H * DPR));
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4); gl.enable(gl.BLEND);
   }
-  drawLayer(1, B.c);
+  drawLayer(1, B.c, !wordNew);
   if (fleet[1]) ms[1] = drawFish(fleet[1]);
   if (fleet[2]) ms[2] = drawFish(fleet[2]);
   for (const f of leavers) drawFish(f);
