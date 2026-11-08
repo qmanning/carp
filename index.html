@@ -35,7 +35,7 @@
   html { scrollbar-width: none; }
   html::-webkit-scrollbar { display: none; }
   html, body { margin: 0; background: var(--bg); color: var(--ink); font-family: 'Inter Tight', system-ui, sans-serif; }
-  #gl { position: fixed; inset: 0; width: 100vw; height: 100vh; display: block; z-index: 0; }
+  #gl { position: fixed; inset: 0; width: 100vw; height: var(--vh, 100vh); display: block; z-index: 0; }
   .fx { position: fixed; inset: 0; z-index: 5; pointer-events: none;
     background: repeating-linear-gradient(0deg, rgba(0,0,0,.2) 0 1px, transparent 1px 3px), radial-gradient(ellipse at 50% 48%, transparent 50%, rgba(0,0,0,.7) 100%); }
   .frame { position: fixed; inset: 14px; z-index: 4; pointer-events: none; border: 1px solid rgba(237,235,228,.07); opacity: 0; transition: opacity .8s; }
@@ -44,6 +44,18 @@
   .frame i:nth-child(3) { bottom: -2px; left: -2px; border-right: 0; border-top: 0; } .frame i:nth-child(4) { bottom: -2px; right: -2px; border-left: 0; border-top: 0; }
   .mono { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; }
   .ui { position: fixed; z-index: 6; }
+  /* wide screens (5120x2160 & the like, Q 2026-11-07): the photos, fish & dam already scale with the screen, the type
+     didn't. --ux (resize()) grows the chrome as a whole & each section's copy from the corner it's anchored to */
+  :root { --ux: 1; }
+  .ui { zoom: var(--ux); }
+  .pane .copy { transform-origin: left bottom; scale: var(--ux); }
+  #p0 .quiet { zoom: var(--ux); }
+  .pane .copy { bottom: calc(166px * var(--ux)); }   /* clear of SCROLL TO CONTINUE & the units (Q: "too close to the bar") */
+  .wide .pane p { font-size: 18px; max-width: 480px; }   /* wide screens: the paragraphs a step up on top of the scale */
+  .wide .pane.photo .copy { max-width: min(520px, calc((100vw - 2 * var(--gm)) / 12 * 4.4 / var(--ux) / 1.18)); }   /* REQUEST CLEARANCE, under the nav's mark: grows with it */
+  .pane .copy.right { transform-origin: right bottom; }
+  .pane.photo .copy, #p2 .copy { transform-origin: left center; }
+  .pane.photo .copy.right, #p2 .copy.right { transform-origin: right center; }
   .classified { top: 0; left: 0; right: 0; height: 20px; background: var(--red); color: #000; display: grid; place-items: center; font-weight: 700; letter-spacing: .4em; transform: translateY(-100%); transition: transform .5s cubic-bezier(.2,.8,.2,1); }
   nav { top: 20px; left: 0; right: 0; display: flex; align-items: center; justify-content: space-between; padding: 18px 34px; }
   nav .mark { font-family: 'Big Shoulders Stencil Display', sans-serif; font-weight: 900; font-size: 30px; letter-spacing: .08em; cursor: pointer; }
@@ -54,15 +66,19 @@
   .tele b { color: var(--amber); font-weight: 700; } .tele .r { color: var(--red); }
   /* the panes ride the same camera as the WebGL world (translated each frame); #spacer gives the page its scroll length */
   main { position: fixed; top: 0; left: 0; right: 0; z-index: 6; pointer-events: none; will-change: transform; }
-  .pane { height: 100vh; position: relative; }
+  .pane { height: var(--vh, 100vh); position: relative; }
   .pane .copy { position: absolute; left: var(--gm); bottom: 134px; max-width: 600px; pointer-events: auto; }
+  #eyebrow { position: absolute; left: 50%; transform: translate(-50%, -100%);
+    width: max-content; max-width: calc(100% - 48px); text-align: center; line-height: 1.35;
+    font-size: clamp(12px, calc(16px * var(--ux)), 46px); font-weight: 600; letter-spacing: .18em;
+    color: var(--ink); text-shadow: 0 1px 4px #000, 0 0 12px #000; }
   #p0 .copy { max-width: 780px; }   /* the hero headline holds one line at its 72 px max ("WET." was orphaned on wide screens) */
   .pane .copy.right { left: auto; right: var(--gm); text-align: right; }
   .pane .tag { color: var(--red); margin-bottom: 12px; min-height: 14px; }
   .pane h2 { margin: 0 0 14px; font-family: 'Big Shoulders Stencil Display', sans-serif; font-weight: 900; font-size: clamp(36px, 4.4vw, 72px); line-height: .86; letter-spacing: .01em; text-transform: uppercase; }
   .pane p { margin: 0 0 22px; color: var(--soft); font-size: 15px; line-height: 1.5; max-width: 430px; text-wrap: pretty; }   /* no orphans */
   .pane .copy.right p { margin-left: auto; }
-  .pane.photo .copy, #p2 .copy { top: calc((116px + 100vh - 140px) / 2); bottom: auto; transform: translateY(-50%); max-width: min(520px, calc((100vw - 2 * var(--gm)) / 12 * 4.2)); }
+  .pane.photo .copy, #p2 .copy { top: calc((116px * var(--ux) + var(--vh, 100vh) - 140px * var(--ux)) / 2); bottom: auto; transform: translateY(-50%);   /* placeCopies() takes over on wider screens */ max-width: min(520px, calc((100vw - 2 * var(--gm)) / 12 * 4.2 / var(--ux))); }
   .pane .brief { list-style: none; padding: 0; margin: -6px 0 22px; color: var(--amber); line-height: 2; }
   .pane .brief li::before { content: '▸ '; color: var(--red); }
   /* 02 // the dam: a survey sheet drawn on like a pen plotter, then the people on it get tracked */
@@ -172,9 +188,9 @@
   .flash h4.y { color: var(--amber); font-size: 46px; }
   dialog { border: 1px solid var(--red); padding: 44px 48px; max-width: 540px; background: #0A0606; color: var(--ink); box-shadow: 0 0 80px rgba(255,42,31,.25); }
   /* the lightbox: the front photo, full screen, in the same amber frame corners; Esc, the button or a click anywhere closes it */
-  dialog.lb { max-width: none; max-height: none; width: 100vw; height: 100vh; margin: 0; padding: 0; border: 0; background: rgba(5,5,5,.94); box-shadow: none; cursor: zoom-out; }
+  dialog.lb { max-width: none; max-height: none; width: 100vw; height: var(--vh, 100vh); margin: 0; padding: 0; border: 0; background: rgba(5,5,5,.94); box-shadow: none; cursor: zoom-out; }
   dialog.lb[open] { display: grid; place-items: center; place-content: center; gap: 18px; }
-  .lb canvas { display: block; max-width: calc(100vw - 96px); max-height: calc(100vh - 150px); outline: 1px solid rgba(255,184,0,.55); outline-offset: 8px; }
+  .lb canvas { display: block; max-width: calc(100vw - 96px); max-height: calc(var(--vh, 100vh) - 150px); outline: 1px solid rgba(255,184,0,.55); outline-offset: 8px; }
   .lb #lbCap { color: var(--soft); text-align: center; max-width: calc(100vw - 96px); }
   .lb form { position: fixed; top: 28px; right: 34px; } dialog.lb button { color: var(--ink); }   /* not red: closing is fine */
   dialog::backdrop { background: rgba(0, 0, 0, .65); backdrop-filter: blur(4px); }
@@ -202,6 +218,7 @@
 <div id="spacer"></div>
 <main>
   <section class="pane" id="p0">
+    <div class="mono" id="eyebrow"></div>
     <div class="copy"><div class="tag mono" id="story"></div><h2 class="chars" id="headline">Lethal. Listening. <span class="red">Wet.</span></h2><p class="late" id="lede">Covert surveillance fish for allied governments, private estates & sensitive water features. Nobody suspects the fish.</p><button class="mono late adv" id="brief" data-go="1"><span class="arr" aria-hidden="true"><i></i><i></i><i></i></span> Next: Infiltrate</button></div>
     <button class="mono late quiet" id="clear">Request clearance ↗</button>
   </section>
@@ -245,7 +262,8 @@ const TAU = Math.PI * 2, clamp = (x, a = 0, b = 1) => Math.max(a, Math.min(b, x)
 const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const canvas = document.getElementById('gl');
 const gl = canvas.getContext('webgl2', { antialias: true, premultipliedAlpha: true, alpha: false });
-let W = 0, H = 0, DPR = 1, camY = 0;
+let W = 0, H = 0, DPR = 1, camY = 0, UX = 1;
+const TOUCH = matchMedia('(pointer: coarse)').matches;   // iPads & phones
 
 // ---------- 2D layers, uploaded as textures each frame ----------
 // A sonar backdrop · D the koi's laser (under the word, like the koi) · B the giant word · C the catfish's laser & HUD
@@ -335,8 +353,33 @@ gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, true);
 const layerTex = [tex(), tex(), tex(), tex(), tex(), tex()], sceneTex = tex(), fbo = gl.createFramebuffer(), sceneTex2 = tex(), fbo2 = gl.createFramebuffer();
 function upload(t, src) { gl.bindTexture(gl.TEXTURE_2D, t); gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, src); }
 
+// a photo section's copy sits level with its photos (Q 2026-11-07): the middle of the copy on the middle of the stack, the
+// scroll drift left out so it doesn't swim. Phones keep their stacked layout.
+function placeCopies() {
+  if (W < 760) return;
+  const dam = document.querySelector('#p2 .copy');
+  if (dam) { const c = ((116 * UX + H - 140 * UX) / 2 - dam.offsetHeight / 2).toFixed(1) + 'px'; if (dam.style.transform !== 'none') dam.style.transform = 'none'; if (dam.style.top !== c) dam.style.top = c; }
+  for (let k = 0; k < panes.length; k++) {
+    const ps = photos.filter(P => P.k === k); if (!ps.length || !copies[k]) continue;
+    let t = Infinity, b = -Infinity;
+    for (const P of ps) { const r = photoRect(P), drift = (P.k * H - camY) * (.08 + .05 * P.slot), y = r.y - P.k * H - drift - (P.oy || 0); t = Math.min(t, y); b = Math.max(b, y + r.h); }
+    // placed by its top edge, unscaled height: the scale grows it about its own centre (a CSS translateY(-50%) would be
+    // scaled along with it, & the copy's translate is already the scroll lead)
+    const el = copies[k], mid = (t + b) / 2, c = (mid - el.offsetHeight / 2).toFixed(1) + 'px';
+    if (el.style.transform !== 'none') el.style.transform = 'none'; if (el.style.top !== c) el.style.top = c;
+    // its scale, so it fits between the nav & the units at that centre (Q: bigger, but "HOLD THE LINE" ran off the top)
+    const want = UX > 1 ? UX * 1.18 : 1, room = 2 * Math.min(mid - 110 * UX, H - 130 * UX - mid), fit = Math.min(want, room / (el.offsetHeight || 1));
+    const sc = Math.max(1, fit).toFixed(3); if (el.style.scale !== sc) el.style.scale = sc;
+  }
+}
 function resize() {
   DPR = Math.min(devicePixelRatio || 1, 1.5); W = innerWidth; H = innerHeight;
+  // wide screens: the type & chrome grow with the width (1.5 at 2560x1080, a 5120x2160 monitor at 2x; 3 at 1x), capped at 3.2
+  UX = W / H >= 1.9 && W >= 1900 ? Math.min(3.2, Math.max(1, W / 1700)) : 1;
+  document.documentElement.style.setProperty('--ux', UX); document.documentElement.classList.toggle('wide', UX > 1);
+  // the visible height, for CSS too: iPad Safari's 100vh ignores its toolbars, so the sections ran taller than the camera
+  // (the copy slid under SCROLL TO CONTINUE & the CARP letters sat off centre); now every section is exactly H tall
+  document.documentElement.style.setProperty('--vh', H + 'px');
   canvas.width = W * DPR; canvas.height = H * DPR;
   for (const L of [A, B, C, D, E, M]) { L.c.width = W * DPR; L.c.height = H * DPR; L.g.setTransform(DPR, 0, 0, DPR, 0, 0); }
   gl.bindTexture(gl.TEXTURE_2D, sceneTex); gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, W * DPR, H * DPR, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
@@ -764,18 +807,25 @@ addEventListener('pointerdown', e => {
 // ---------- the intro choreography ----------
 const T0 = performance.now(); const clock = () => (performance.now() - T0) / 1000;
 const WORD_Y = .36, WORD = 'CARP.', SUB = 'COVERT AQUATIC RECONNAISSANCE PLATFORMS';
+const eyebrow = document.getElementById('eyebrow');
 const LETTER_AT = [1.3, 1.55, 1.8, 2.05, 2.4], SUB_AT = 2.5, FISH_AT = 2.7, LASER_AT = 4.2, HEAD_AT = 4.5, REST_AT = 5.6;
 const landed = LETTER_AT.map(() => false);
 let wordFont = 0, letterX = [];
 // the word sits between the nav & the hero copy whatever the screen's shape (16:9 pushed it into the nav)
 let wordCY = 0, capH = 0;
 function layoutWord() {
-  const g = B.g, copy = document.querySelector('#p0 .copy'), top = 112, bottom = Math.max(top + 160, copy.offsetTop - 26);
+  const g = B.g, copy = document.querySelector('#p0 .copy'), top = 112 * UX, bottom = Math.max(top + 160, copy.offsetTop - copy.offsetHeight * (UX - 1) - 26 * UX);
   g.font = "900 100px 'Big Shoulders Stencil Display'"; const r = g.measureText('CARP').actualBoundingBoxAscent / 100 || .72;
-  wordFont = Math.min(W * .29, (bottom - top - 30) / r); capH = wordFont * r; wordCY = top + 30 + (bottom - top - 30) / 2;
+  // wide & touch screens (iPads: short behind their browser bars): the letters no taller than ~a third of the screen
+  wordFont = Math.min(W * .29, (bottom - top - 30) / r, UX > 1 || TOUCH ? H * .3 / r : Infinity); capH = wordFont * r; wordCY = top + 30 + (bottom - top - 30) / 2;
   g.font = `900 ${wordFont}px 'Big Shoulders Stencil Display'`;
   const widths = [...WORD].map(ch => g.measureText(ch).width), gap = wordFont * .02, total = widths.reduce((a, b) => a + b, 0) + gap * (WORD.length - 1);
   let x = W / 2 - total / 2; letterX = widths.map(w => { const c = x + w / 2; x += w + gap; return c; });
+  g.textAlign = 'center';
+  const firstEdge = letterX[0] - g.measureText(WORD[0]).actualBoundingBoxLeft;
+  const lastEdge = letterX[3] + g.measureText(WORD[3]).actualBoundingBoxRight;
+  eyebrow.style.left = `${(firstEdge + lastEdge) / 2}px`;
+  eyebrow.style.top = `${wordCY - capH / 2 - 12 * UX}px`;
   letterX[4] -= wordFont * .09;   // the period tucks in under the P's bowl
 }
 // how far the letters' fill sinks to glass after landing: .93 = see-through glass, 0 = solid (Q 2026-11-05: 75% opaque)
@@ -802,8 +852,7 @@ function drawWord(t) {
     g.restore();
   });
   const n = still ? SUB.length : Math.floor(clamp((t - SUB_AT) / 1.1) * SUB.length);
-  if (n) { g.font = `500 11px 'JetBrains Mono'`; g.fillStyle = '#FF2A1F'; g.textAlign = 'center';
-    g.fillText(SUB.slice(0, n).split('').join('  '), W / 2, cy - capH / 2 - 20); }
+  if (eyebrow.textContent.length !== n) eyebrow.textContent = SUB.slice(0, n);
 }
 // ---------- backdrop: a quiet scrolling grid; the sonar on the hero & again on the close ----------
 function radar(g, t, cx, cy, a) {
@@ -1439,7 +1488,7 @@ function frame() {
   gl.enable(gl.BLEND); gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
   drawPhotos(t, dt, true);
   E.g.clearRect(0, 0, W, H); photoFrames(E.g, t); drawPings(E.g, t); drawLayer(4, E.c);
-  autoSwap(t); placeSwap(); telemetry(t); typeStory(t); if (dam && Math.abs(camY - dam.k * H) < H) dam.update(t, reveal[dam.k]);
+  autoSwap(t); placeSwap(); placeCopies(); telemetry(t); typeStory(t); if (dam && Math.abs(camY - dam.k * H) < H) dam.update(t, reveal[dam.k]);
   requestAnimationFrame(frame);
 }
 frame();
