@@ -74,6 +74,8 @@ Key out the green, save it as a PNG & swap it in for one of the `fish-*.png` fil
 
 ## Credits
 
+`koi/` is **2026 Websites**, a quick homage to Marina's koi page: three painted koi swimming over the type, the same swimming code as CARP. Open `koi/index.html` from a local server, or see it live at [qmanning.com/labs/carp/koi](https://qmanning.com/labs/carp/koi).
+
 Inspired by [Marina Budarina](https://budarina-koi.runable.site)'s koi. Go play with hers, too. If you make your own on-brief brand, tag me. Credit the original creators, poke fun at the genre, never the person.
 
 ## License
