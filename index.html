@@ -207,7 +207,7 @@
 <div class="fx"></div>
 
 <div class="ui classified mono">Top secret // noforn // carp-aq</div>
-<nav class="ui mono"><div class="mark late" id="home">CARP<b>.</b></div><div class="links late"><a data-go="1">Infiltrate</a><a data-go="2">Hold</a><a data-go="3">Protect</a><a data-go="4">Designate</a><a data-go="5">Heritage</a></div><button class="late" id="demo">Request a demo</button></nav>
+<nav class="ui mono"><div class="mark late" id="home">CARP<b>.</b></div><div class="links late"><a data-go="1">Infiltrate</a><a data-go="2">Hold</a><a data-go="3">Protect</a><a data-go="4">Designate</a><a data-go="5">Heritage</a></div><button class="late" id="snd" aria-pressed="true">Sound on</button></nav>
 <div class="ui tele mono" id="tele"></div>
 <div class="ui pager late" id="pager"><i class="on"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
 <div class="ui br mono late" id="units">Click to direct the fleet<span><button id="less" aria-label="Fewer units">–</button><b id="count">2 units deployed</b><button id="more" aria-label="More units">+</button></span></div>
@@ -589,6 +589,7 @@ function flashTraffic() {   // the tuna is a tank: it gets an urgent banner & a 
   el.classList.remove('on'); void el.offsetWidth; el.classList.add('on');
   clearTimeout(flashTimer); flashTimer = setTimeout(() => el.classList.remove('on'), 4800);
   try {
+    if (!soundOn) throw 0;   // Sound off: no klaxon, no ping
     actx = actx || new (window.AudioContext || window.webkitAudioContext)(); if (actx.state === 'suspended') actx.resume();
     const t = actx.currentTime, o = actx.createOscillator(), g = actx.createGain();
     o.type = 'square'; for (let k = 0; k < 6; k++) o.frequency.setValueAtTime(k % 2 ? 620 : 880, t + k * .25);
@@ -1316,9 +1317,10 @@ const dam = (() => {
 })();
 
 // ---------- click: a sonar ping where the fleet is headed, a pinpoint until they get there ----------
-const pings = []; let actx = null, pin = null;
+const pings = []; let actx = null, pin = null, soundOn = true;   // soundOn: the nav's Sound button (all sound)
 function pingSound() {
   try {
+    if (!soundOn) throw 0;   // Sound off: no klaxon, no ping
     actx = actx || new (window.AudioContext || window.webkitAudioContext)(); if (actx.state === 'suspended') actx.resume();
     // a soft bell: G5 with a quiet octave, one steady pitch so it never clashes with its own echo, at half the old
     // level (Q 2026-11-05: the falling ping, then a chord, were dissonant; "bring the volume down")
@@ -1448,7 +1450,21 @@ const dlg = document.getElementById('dlg');
 function say(k, h, p) { document.getElementById('dk').textContent = k; document.getElementById('dh').textContent = h; document.getElementById('dp').textContent = p; dlg.showModal(); }
 const clearance = () => say('Clearance', 'We make attack fish.', 'Each CARP unit is a living fish in articulated armor, with low-light eyes & a target designator. They patrol, they watch & they report. Nobody suspects the fish.');
 document.getElementById('clear').onclick = clearance; document.getElementById('brief2').onclick = clearance;
-document.getElementById('demo').onclick = () => say('Live fire', 'Demonstrations are held in a secure pond.', 'Bring clearance & a towel.');
+// ---------- sound (Q 2026-11-09): the metal version of the song (Orchestral Fragment) loops, from the first click or
+// key (browsers won't play before one); the nav's Sound button turns all sound on & off: the song, the pings, the klaxon ----------
+const song = new Audio('assets/orchestral-fragment.m4a'); song.loop = true; song.volume = .5; song.preload = 'none';
+const sndBtn = document.getElementById('snd'); let songOn = false;
+const showSound = () => { sndBtn.textContent = soundOn ? 'Sound on' : 'Sound off'; sndBtn.setAttribute('aria-pressed', String(soundOn)); };
+const playSong = () => { songOn = true; song.play().catch(() => { songOn = false; }); };
+const firstGesture = (e) => { if (!soundOn || songOn || (e.target.closest && e.target.closest('#snd'))) return; playSong(); };
+addEventListener('pointerdown', firstGesture, true); addEventListener('keydown', firstGesture, true);
+sndBtn.onclick = () => {
+  if (soundOn && !songOn) { playSong(); return; }   // the button is the first thing clicked: start the song, don't mute
+  soundOn = !soundOn;
+  if (soundOn) { playSong(); if (actx) actx.resume(); } else { song.pause(); songOn = false; if (actx) actx.suspend(); }
+  showSound();
+};
+showSound();
 
 // ---------- frame ----------
 let prev = clock(), fontsReady = false;
