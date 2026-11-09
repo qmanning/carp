@@ -19,29 +19,33 @@
   .word i { display: inline-block; font-style: normal; opacity: 0; transform: translateY(.18em); filter: blur(12px);
     animation: in 1.1s cubic-bezier(.2, .8, .2, 1) forwards; }
   @keyframes in { to { opacity: 1; transform: none; filter: blur(0); } }
+  #ws i:first-child { margin-right: -.07em; }   /* kern the W into the e (Q: too far apart) */
   .side { position: fixed; z-index: 4; font-size: 11px; font-weight: 500; letter-spacing: .08em; line-height: 1.25; text-transform: uppercase; opacity: 0; animation: fade 1s 2.2s forwards; }
   @keyframes fade { to { opacity: 1; } }
   /* the chrome, as hers: a white square mark top left, a white pill top right, the count bottom left, About bottom centre */
   .mark { position: fixed; z-index: 5; top: 20px; left: 20px; width: 42px; height: 42px; display: block; }   /* the Q logo (Q) */
   .pill { position: fixed; z-index: 5; top: 20px; right: 20px; display: flex; gap: 2px; padding: 3px; border-radius: 7px; background: #fff; }
-  .pill b { display: grid; place-items: center; min-width: 32px; height: 32px; padding: 0 2px; border-radius: 5px; color: #202020; font-size: 11.2px; font-weight: 500; }
-  .pill b.c { padding: 0 12px; background: #e3e3e3; letter-spacing: .02em; }
+  .pill b, .pill a { display: grid; place-items: center; min-width: 32px; height: 32px; padding: 0 2px; border-radius: 5px; color: #202020; font-size: 11.2px; font-weight: 500; }
+  .pill a { text-decoration: none; }
+  .pill .c { padding: 0 12px; background: #e3e3e3; letter-spacing: .02em; }
   .pill svg { width: 13px; height: 13px; }
   .koi { position: fixed; z-index: 5; left: 20px; bottom: 34px; display: flex; align-items: center; gap: 4px; height: 34px; padding: 0 6px; border-radius: 6px;
     background: rgba(0, 0, 0, .14); font-size: 11.2px; letter-spacing: .08em; }
   .koi button { all: unset; cursor: pointer; width: 26px; text-align: center; font-size: 17.6px; font-weight: 600; }
   .about { position: fixed; z-index: 5; left: 50%; bottom: 34px; transform: translateX(-50%); height: 34px; padding: 0 14px; border-radius: 6px;
-    background: rgba(0, 0, 0, .14); display: grid; place-items: center; font-size: 11.2px; font-weight: 500; }
+    background: rgba(0, 0, 0, .14); display: grid; place-items: center; font-size: 11.2px; font-weight: 500; color: inherit; text-decoration: none; }
+  /* Marina's handle goes to her Instagram (Q 2026-11-09) */
+  .side a { color: inherit; text-decoration: none; } .side a:hover { text-decoration: underline; text-underline-offset: 2px; }
 </style></head>
 <body>
 <canvas id="stars"></canvas><canvas id="under"></canvas>
 <div class="word" aria-label="2026 Websites"><span class="yr" id="yr">2026</span><span class="ws" id="ws">Websites</span></div>
 <canvas id="over"></canvas>
-<div class="side" id="sl">Badass creative</div><div class="side" id="sr">Après<br>@marina_uiux</div>
+<div class="side" id="sl">Badass creative</div><div class="side" id="sr">Après<br><a href="https://www.instagram.com/marina_uiux/" target="_blank" rel="noopener noreferrer">@marina_uiux</a></div>
 <img class="mark" src="q-logo.png" alt="Q">
-<div class="pill"><b><svg viewBox="0 0 16 16" fill="none" stroke="#202020" stroke-width="1.6"><path d="M2 4h12M2 8h12M2 12h12"/></svg></b><b><svg viewBox="0 0 16 16" fill="#202020"><path d="M2 6h3l4-3v10l-4-3H2z"/><path d="M11 6l4 4M15 6l-4 4" stroke="#202020" stroke-width="1.4"/></svg></b><b class="c">CONTACT</b></div>
+<div class="pill"><b><svg viewBox="0 0 16 16" fill="#202020"><path d="M2 6h3l4-3v10l-4-3H2z"/><path d="M11 6l4 4M15 6l-4 4" stroke="#202020" stroke-width="1.4"/></svg></b><a class="c" href="https://www.qmanning.com/about">CONTACT</a></div>
 <div class="koi"><button id="less">−</button><span id="count">3 KOI</span><button id="more">+</button></div>
-<div class="about">ABOUT</div>
+<a class="about" href="https://www.qmanning.com/about">ABOUT</a>
 <script>
 const $ = id => document.getElementById(id);
 // the word types in letter by letter
@@ -188,7 +192,7 @@ let fish = [];
 fish = KOI.map((_, k) => new Koi(k, true));
 let n = 3; function setN(m) { n = Math.max(1, Math.min(3, m)); $('count').textContent = n + ' KOI'; while (fish.length < n) fish.push(new Koi(fish.length, false)); fish.length = n; }
 $('less').onclick = () => setN(n - 1); $('more').onclick = () => setN(n + 1);
-addEventListener('pointerdown', e => { if (e.target.closest('button,.pill,.mark,.about')) return; let best = null, bd = 1e9;   // a click calls the nearest koi over
+addEventListener('pointerdown', e => { if (e.target.closest('button,a,.pill,.mark,.about')) return; let best = null, bd = 1e9;   // a click calls the nearest koi over
   for (const f of fish) { const dd = Math.hypot(f.x - e.clientX, f.y - e.clientY); if (dd < bd) { bd = dd; best = f; } } if (best) best.call = { x: e.clientX, y: e.clientY, until: performance.now() / 1000 + 4 }; });
 
 let last = 0;
