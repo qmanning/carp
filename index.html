@@ -253,7 +253,7 @@
 </main>
 
 <div class="wipe mono" id="wipe" data-dir="down"><span id="wipeT">Rerouting</span></div>
-<div class="flash" id="flash" role="alert"><div class="hz"></div><div class="in2"><div class="mono"><span>⚠ Urgent // flash traffic</span><span id="flashT">--:--:--Z</span></div><h4>Major artillery inbound.</h4><h4 class="y">BLUETUNA INCOMING.</h4></div><div class="hz"></div></div>
+<div class="flash" id="flash" role="alert"><div class="hz"></div><div class="in2"><div class="mono"><span>⚠ Urgent // flash traffic</span><span id="flashT">--:--:--Z</span></div><h4>Major artillery inbound.</h4><h4 class="y">BLEUTUNA INCOMING.</h4></div><div class="hz"></div></div>
 <dialog id="lb" class="lb" aria-label="Photo"><canvas id="lbC"></canvas><div class="mono" id="lbCap"></div><form method="dialog"><button class="mono" aria-label="Close photo">Close ✕</button></form></dialog>
 <dialog id="dlg"><div class="mono" id="dk">Briefing</div><h3 id="dh"></h3><p id="dp"></p><form method="dialog"><button class="mono">Return to operations</button></form></dialog>
 
@@ -715,7 +715,7 @@ const puffer = {
   },
   hit(x, y) { return this.on && Math.hypot(x - this.x, y - this.y) < this.r * 1.1; },
 };
-// PUFF-04's notice: no klaxon, no banner (Q: "not as big of an announcement as BLUETUNA's arrival"), just the fleet's
+// PUFF-04's notice: no klaxon, no banner (Q: "not as big of an announcement as BLEUTUNA's arrival"), just the fleet's
 // own tag style beside it, red while it's armed & amber while it leaks back down
 function puffTag(g, t) {
   const p = puffer; if (!p.on || (!p.target && !p.leak)) return;
@@ -1450,15 +1450,13 @@ const dlg = document.getElementById('dlg');
 function say(k, h, p) { document.getElementById('dk').textContent = k; document.getElementById('dh').textContent = h; document.getElementById('dp').textContent = p; dlg.showModal(); }
 const clearance = () => say('Clearance', 'We make attack fish.', 'Each CARP unit is a living fish in articulated armor, with low-light eyes & a target designator. They patrol, they watch & they report. Nobody suspects the fish.');
 document.getElementById('clear').onclick = clearance; document.getElementById('brief2').onclick = clearance;
-// ---------- sound (Q 2026-11-09): the metal version of the song (Orchestral Fragment) loops while sound is on; the nav's
-// Sound button turns all sound on & off (the song, the pings, the klaxon). Off by default: nothing plays until it's clicked ----------
-const song = new Audio('assets/orchestral-fragment.m4a'); song.loop = true; song.volume = .5; song.preload = 'none';
-const sndBtn = document.getElementById('snd'); let songOn = false;
+// ---------- sound: the nav's Sound button turns the radar pings & the BLEUTUNA klaxon on & off. No music on this page
+// (Q 2026-11-19: Sound on/off was only ever for the radar & the warning). Off by default: nothing plays until it's clicked ----------
+const sndBtn = document.getElementById('snd');
 const showSound = () => { sndBtn.textContent = soundOn ? 'Sound on' : 'Sound off'; sndBtn.setAttribute('aria-pressed', String(soundOn)); };
-const playSong = () => { songOn = true; song.play().catch(() => { songOn = false; }); };
 sndBtn.onclick = () => {
   soundOn = !soundOn;
-  if (soundOn) { playSong(); if (actx) actx.resume(); } else { song.pause(); songOn = false; if (actx) actx.suspend(); }
+  if (actx) { if (soundOn) actx.resume(); else actx.suspend(); }
   showSound();
 };
 showSound();
